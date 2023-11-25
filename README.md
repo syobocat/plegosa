@@ -7,7 +7,7 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 # どう使うの
 
 `.env`ファイルを作って以下の情報を書きこめばOKです。環境変数でも問題ありませんが衝突防止の点から`.env`が好ましいでしょう。  
-`USER_*`でのユーザーの書式は`@hoge@example.tld`ではなく`hoge@example.tld`なので注意してください。
+`USER_*`でのユーザーの書式は`@hoge@example.tld`ではなく`hoge@example.tld`なので注意してください。なお、ローカルのユーザーの場合は`@example.tld`すら不要で`hoge`のみです。
 
 ```
 SOFTWARE=ソフトウェア名(例:Pleroma)
