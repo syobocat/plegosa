@@ -1,0 +1,15 @@
+[package]
+name = "plegosa"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+megalodon = { version = "0.11" }
+tokio = { version = "1", features = ["full"] }
+log = { version = "0.4" }
+env_logger = { version = "0.10" }
+dotenvy = { version = "0.15" }
+ureq = { version = "2.9", features = ["json"] }
+nanohtml2text = { version = "0.1.4" }
