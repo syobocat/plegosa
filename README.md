@@ -12,7 +12,7 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 ```
 SOFTWARE=ソフトウェア名(例:Pleroma)
 INSTANCE_URL=インスタンスのURL(例:pleroma.social)
-ACCESS_TOKEN=アクセストークン(わからなければ空にしておくと生成してくれます、設定は手動)
+ACCESS_TOKEN=アクセストークン(わからなければ空行にしておくと生成してくれます、設定は手動)
 LOGGER=ヒットした投稿の出力先(現状stdoutとDiscordにのみ対応)
 LOGGER_URL=DiscordのWebhook URL(LOGGERがDiscordの場合のみ)
 INCLUDE=ヒットさせたい単語(カンマ区切り、空の場合全てにヒットします)
@@ -20,6 +20,17 @@ EXCLUDE=ヒットさせたくない単語(カンマ区切り)
 USER_INCLUDE=ヒットさせたいユーザー(カンマ区切り、空の場合全ユーザーにヒットします)
 USER_EXCLUDE=ヒットさせたくないユーザー(カンマ区切り、自分の投稿を除外したいときなど)
 ```
+
+`ACCESS_TOKEN`は状態によって挙動が異なります。
+
+1. 設定されていない場合  
+アクセストークンの生成処理が走ります。
+
+2. 設定されているが空の場合(`ACCESS_TOKEN=`の状態)  
+監視対象がGTL(「すべてのネットワーク」(Pleroma)、「連合タイムライン」(Mastodon))になります。
+
+3. 設定されていて、中身が存在する場合(`ACCESS_TOKEN=xxxxxxxxxx`の状態)  
+監視対象がHTLになります。
 
 # Known issues
 

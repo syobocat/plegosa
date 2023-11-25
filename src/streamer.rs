@@ -4,14 +4,18 @@ use megalodon::{generator, streaming::Message};
 pub async fn streaming(
     sns: megalodon::SNS,
     url: &str,
-    token: String,
+    token: Option<String>,
     output_dest: String,
     logging_url: Option<String>,
     filter: crate::logger::Filter,
 ) {
-    let client = generator(sns, format!("https://{}", url), Some(token), None);
+    let client = generator(sns, format!("https://{}", url), token.clone(), None);
 
-    let streaming = client.user_streaming(format!("wss://{}", url));
+    let streaming = if token.is_some() {
+        client.user_streaming(format!("wss://{}", url))
+    } else {
+        client.public_streaming(format!("wss://{}", url))
+    };
 
     let logger = crate::logger::Logger::new(output_dest, logging_url);
 

@@ -40,11 +40,19 @@ async fn main() {
         return
     };
 
-    let Ok(token) = dotenvy::var("ACCESS_TOKEN") else {
-        // If ACCSESS_TOKEN is not set, generate one
-        eprintln!("* ACCESS_TOKEN is not set. Generating...");
-        streamer::oath(sns, url.as_str()).await;
-        return
+    let token = match dotenvy::var("ACCESS_TOKEN") {
+        Ok(token) => {
+            if token.is_empty() {
+                None
+            } else {
+                Some(token)
+            }
+        }
+        Err(_) => {
+            eprintln!("* ACCESS_TOKEN is not set. Generating...");
+            streamer::oath(sns, url.as_str()).await;
+            return;
+        }
     };
 
     let logging_method = match dotenvy::var("LOGGER") {
@@ -79,6 +87,7 @@ async fn main() {
 
     let filter = logger::Filter::new(include, exclude, user_include, user_exclude);
 
+    info!("{:?}", token);
     info!("{:?}", filter);
 
     streamer::streaming(
