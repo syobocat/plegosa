@@ -55,10 +55,7 @@ async fn main() {
         }
     };
 
-    let logging_url: Option<String> = match dotenvy::var("LOGGER_URL") {
-        Ok(url) => Some(url),
-        Err(_) => None,
-    };
+    let logging_url = dotenvy::var("LOGGER_URL").ok();
 
     let include: Vec<String> = match dotenvy::var("INCLUDE") {
         Ok(include) => include.split(',').map(|x| x.to_string()).collect(),
