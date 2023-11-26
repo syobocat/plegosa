@@ -26,7 +26,7 @@ impl Logger {
                     "{}",
                     message.plain_content.unwrap_or(html2text(&message.content))
                 );
-                println!("URL: {}", message.url.unwrap_or_default());
+                println!("URL: {}", message.uri);
                 Ok(())
             }
             "discord" => {
@@ -38,7 +38,7 @@ impl Logger {
                         //"username": message.account.display_name,
                         //"avatar_url": message.account.avatar,
                         //"content": message.plain_content.unwrap_or(html2text(&message.content)),
-                        "content": message.url,
+                        "content": message.uri,
                     }))
                     .is_err()
                 {
@@ -85,18 +85,12 @@ pub fn egosa(
     tl: Option<ExtraTimeline>,
 ) -> bool {
     // Remove dupicates from Home Timeline
-    if tl.is_none()
-        && matches!(settings.extra_tl, Some(ExtraTimeline::Public))
-        && message.visibility == megalodon::entities::StatusVisibility::Public
-    {
-        return false;
-    }
-    if tl.is_none()
-        && matches!(settings.extra_tl, Some(ExtraTimeline::Local))
-        && !message.account.acct.contains('@')
-        && message.visibility == megalodon::entities::StatusVisibility::Public
-    {
-        return false;
+    if tl.is_none() && message.visibility == megalodon::entities::StatusVisibility::Public {
+        match settings.extra_tl {
+            Some(ExtraTimeline::Public) => return false,
+            Some(ExtraTimeline::Local) => return message.account.acct.contains('@'),
+            _ => {}
+        };
     }
 
     if !settings.user_include.is_empty() && !settings.user_include.contains(&message.account.acct) {
