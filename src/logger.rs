@@ -93,7 +93,7 @@ pub fn egosa(
     }
     if tl.is_none()
         && matches!(settings.extra_tl, Some(ExtraTimeline::Local))
-        && !message.account.acct.contains("@")
+        && !message.account.acct.contains('@')
         && message.visibility == megalodon::entities::StatusVisibility::Public
     {
         return false;
