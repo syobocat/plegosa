@@ -41,7 +41,10 @@ async fn main() {
         Ok(tl_type) => match tl_type.to_lowercase().as_str() {
             "public" => Some(ExtraTimeline::Public),
             "local" => Some(ExtraTimeline::Local),
-            _ => panic!("* EXTRA_TIMELINE is invalid. Valid values are Public or Local."),
+            _ => {
+                eprintln!("* EXTRA_TIMELINE is invalid. Valid values are Public or Local.");
+                return;
+            }
         },
     };
 
@@ -50,13 +53,10 @@ async fn main() {
         return;
     };
 
-    let token = match dotenvy::var("ACCESS_TOKEN") {
-        Ok(token) => token,
-        Err(_) => {
-            eprintln!("* ACCESS_TOKEN is not set. Generating...");
-            streamer::oath(sns, url.as_str()).await;
-            return;
-        }
+    let Ok(token) = dotenvy::var("ACCESS_TOKEN") else {
+        eprintln!("* ACCESS_TOKEN is not set. Generating...");
+        streamer::oath(sns, url.as_str()).await;
+        return;
     };
 
     let logging_method = match dotenvy::var("LOGGER") {
