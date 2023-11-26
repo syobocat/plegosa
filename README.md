@@ -15,22 +15,21 @@ INSTANCE_URL=インスタンスのURL(例:pleroma.social)
 ACCESS_TOKEN=アクセストークン(わからなければ空行にしておくと生成してくれます、設定は手動)
 LOGGER=ヒットした投稿の出力先(現状stdoutとDiscordにのみ対応)
 LOGGER_URL=DiscordのWebhook URL(LOGGERがDiscordの場合のみ)
+EXTRA_TIMELINE=追加で監視対象にするタイムライン(PublicまたはLocal)
 INCLUDE=ヒットさせたい単語(カンマ区切り、空の場合全てにヒットします)
 EXCLUDE=ヒットさせたくない単語(カンマ区切り)
 USER_INCLUDE=ヒットさせたいユーザー(カンマ区切り、空の場合全ユーザーにヒットします)
 USER_EXCLUDE=ヒットさせたくないユーザー(カンマ区切り、自分の投稿を除外したいときなど)
 ```
 
-`ACCESS_TOKEN`は状態によって挙動が異なります。
+`EXTRA_TIMELINE`の挙動について
 
-1. 設定されていない場合  
-アクセストークンの生成処理が走ります。
+1. 未設定の場合、HTLのみを監視します。
 
-2. 設定されているが空の場合(`ACCESS_TOKEN=`の状態)  
-監視対象がGTL(「すべてのネットワーク」(Pleroma)、「連合タイムライン」(Mastodon))になります。
+2. Publicが指定されている場合、HTLに加えてGTL(「すべてのネットワーク」(Pleroma)、「連合タイムライン」(Mastodon))も監視します。(GTLが使用できるサーバーのみ)
 
-3. 設定されていて、中身が存在する場合(`ACCESS_TOKEN=xxxxxxxxxx`の状態)  
-監視対象がHTLになります。
+3. Localが指定されている場合、HTLに加えてLTL(「公開タイムライン」(Pleroma))も監視します。(LTLが使用できるサーバーのみ)
+
 
 # Known issues
 

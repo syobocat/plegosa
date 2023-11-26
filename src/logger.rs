@@ -1,3 +1,4 @@
+use crate::streamer::ExtraTimeline;
 use nanohtml2text::html2text;
 
 #[derive(Clone)]
@@ -53,6 +54,7 @@ impl Logger {
 
 #[derive(Clone, Debug)]
 pub struct Filter {
+    extra_tl: Option<ExtraTimeline>,
     include: Vec<String>,
     exclude: Vec<String>,
     user_include: Vec<String>,
@@ -61,12 +63,14 @@ pub struct Filter {
 
 impl Filter {
     pub fn new(
+        extra_tl: Option<ExtraTimeline>,
         include: Vec<String>,
         exclude: Vec<String>,
         user_include: Vec<String>,
         user_exclude: Vec<String>,
     ) -> Filter {
         Filter {
+            extra_tl,
             include,
             exclude,
             user_include,
@@ -75,7 +79,26 @@ impl Filter {
     }
 }
 
-pub fn egosa(message: megalodon::entities::status::Status, settings: Filter) -> bool {
+pub fn egosa(
+    message: megalodon::entities::status::Status,
+    settings: Filter,
+    tl: Option<ExtraTimeline>,
+) -> bool {
+    // Remove dupicates from Home Timeline
+    if tl.is_none()
+        && matches!(settings.extra_tl, Some(ExtraTimeline::Public))
+        && message.visibility == megalodon::entities::StatusVisibility::Public
+    {
+        return false;
+    }
+    if tl.is_none()
+        && matches!(settings.extra_tl, Some(ExtraTimeline::Local))
+        && !message.account.acct.contains("@")
+        && message.visibility == megalodon::entities::StatusVisibility::Public
+    {
+        return false;
+    }
+
     if !settings.user_include.is_empty() && !settings.user_include.contains(&message.account.acct) {
         return false;
     }
