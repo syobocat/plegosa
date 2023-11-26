@@ -1,20 +1,27 @@
 use log::error;
 use megalodon::{generator, streaming::Message};
 
+#[derive(Clone, Debug)]
+pub enum ExtraTimeline {
+    Public,
+    Local,
+}
+
 pub async fn streaming(
     sns: megalodon::SNS,
-    url: &str,
-    token: Option<String>,
+    url: String,
+    token: String,
     output_dest: String,
     logging_url: Option<String>,
     filter: crate::logger::Filter,
+    tl: Option<ExtraTimeline>,
 ) {
-    let client = generator(sns, format!("https://{}", url), token.clone(), None);
+    let client = generator(sns, format!("https://{}", url), Some(token), None);
 
-    let streaming = if token.is_some() {
-        client.user_streaming(format!("wss://{}", url))
-    } else {
-        client.public_streaming(format!("wss://{}", url))
+    let streaming = match tl {
+        Some(ExtraTimeline::Public) => client.public_streaming(format!("wss://{}", url)),
+        Some(ExtraTimeline::Local) => client.local_streaming(format!("wss://{}", url)),
+        None => client.user_streaming(format!("wss://{}", url)),
     };
 
     let logger = crate::logger::Logger::new(output_dest, logging_url);
@@ -22,7 +29,7 @@ pub async fn streaming(
     streaming
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
-                if crate::logger::egosa(mes.clone(), filter.clone()) {
+                if crate::logger::egosa(mes.clone(), filter.clone(), tl.clone()) {
                     if let Err(e) = logger.clone().log(mes) {
                         error!("{}", e);
                     };

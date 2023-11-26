@@ -1,5 +1,6 @@
 use log::info;
 use megalodon::SNS;
+use streamer::ExtraTimeline;
 
 mod logger;
 mod streamer;
@@ -35,19 +36,22 @@ async fn main() {
         },
     };
 
+    let extra_tl = match dotenvy::var("EXTRA_TIMELINE") {
+        Err(_) => None,
+        Ok(tl_type) => match tl_type.to_lowercase().as_str() {
+            "public" => Some(ExtraTimeline::Public),
+            "local" => Some(ExtraTimeline::Local),
+            _ => panic!("* EXTRA_TIMELINE is invalid. Valid values are Public or Local."),
+        },
+    };
+
     let Ok(url) = dotenvy::var("INSTANCE_URL") else {
         eprintln!("* Please specify INSTANCE_URL to listen to.");
-        return
+        return;
     };
 
     let token = match dotenvy::var("ACCESS_TOKEN") {
-        Ok(token) => {
-            if token.is_empty() {
-                None
-            } else {
-                Some(token)
-            }
-        }
+        Ok(token) => token,
         Err(_) => {
             eprintln!("* ACCESS_TOKEN is not set. Generating...");
             streamer::oath(sns, url.as_str()).await;
@@ -85,18 +89,41 @@ async fn main() {
         Err(_) => vec![],
     };
 
-    let filter = logger::Filter::new(include, exclude, user_include, user_exclude);
+    let filter = logger::Filter::new(
+        extra_tl.clone(),
+        include,
+        exclude,
+        user_include,
+        user_exclude,
+    );
 
     info!("{:?}", token);
     info!("{:?}", filter);
 
-    streamer::streaming(
-        sns,
-        url.as_str(),
-        token,
-        logging_method,
-        logging_url,
-        filter,
-    )
-    .await;
+    // Extra Timeline
+    let extra_tl_handle = if let Some(tl) = extra_tl {
+        tokio::spawn(streamer::streaming(
+            sns.clone(),
+            url.clone(),
+            token.clone(),
+            logging_method.clone(),
+            logging_url.clone(),
+            filter.clone(),
+            Some(tl),
+        ))
+    } else {
+        tokio::spawn(async {})
+    };
+    // Home Timeline
+    let home_tl_handle = tokio::spawn(streamer::streaming(
+        sns.clone(),
+        url.clone(),
+        token.clone(),
+        logging_method.clone(),
+        logging_url.clone(),
+        filter.clone(),
+        None,
+    ));
+
+    let _ = tokio::join!(home_tl_handle, extra_tl_handle);
 }
