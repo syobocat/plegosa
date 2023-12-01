@@ -1,3 +1,4 @@
+use kanaria::string::UCSStr;
 use log::info;
 use megalodon::SNS;
 use streamer::ExtraTimeline;
@@ -97,7 +98,7 @@ async fn main() {
             } else {
                 include
                     .split(',')
-                    .map(|x| x.to_string().to_lowercase())
+                    .map(|x| UCSStr::from_str(x).lower_case().hiragana().to_string())
                     .collect()
             }
         }
@@ -111,7 +112,7 @@ async fn main() {
             } else {
                 exclude
                     .split(',')
-                    .map(|x| x.to_string().to_lowercase())
+                    .map(|x| UCSStr::from_str(x).lower_case().hiragana().to_string())
                     .collect()
             }
         }

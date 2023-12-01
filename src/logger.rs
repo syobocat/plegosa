@@ -1,4 +1,5 @@
 use crate::streamer::ExtraTimeline;
+use kanaria::string::UCSStr;
 use nanohtml2text::html2text;
 
 #[derive(Clone)]
@@ -105,7 +106,10 @@ pub fn egosa(
     let content = if settings.is_case_sensitive {
         message.content
     } else {
-        message.content.to_lowercase()
+        UCSStr::from_str(message.content.as_str())
+            .lower_case()
+            .hiragana()
+            .to_string()
     };
     if !settings.include.is_empty()
         && settings
