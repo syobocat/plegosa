@@ -16,6 +16,7 @@ ACCESS_TOKEN=アクセストークン(わからなければ空行にしておく
 LOGGER=ヒットした投稿の出力先(現状stdoutとDiscordにのみ対応)
 LOGGER_URL=DiscordのWebhook URL(LOGGERがDiscordの場合のみ)
 EXTRA_TIMELINE=追加で監視対象にするタイムライン(PublicまたはLocal)
+CASE_SENSITIVE=大文字/小文字を区別する(true/false、デフォルト:true)
 INCLUDE=ヒットさせたい単語(カンマ区切り、空の場合全てにヒットします)
 EXCLUDE=ヒットさせたくない単語(カンマ区切り)
 USER_INCLUDE=ヒットさせたいユーザー(カンマ区切り、空の場合全ユーザーにヒットします)

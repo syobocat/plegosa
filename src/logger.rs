@@ -59,6 +59,7 @@ pub struct Filter {
     exclude: Vec<String>,
     user_include: Vec<String>,
     user_exclude: Vec<String>,
+    is_case_sensitive: bool,
 }
 
 impl Filter {
@@ -68,6 +69,7 @@ impl Filter {
         exclude: Vec<String>,
         user_include: Vec<String>,
         user_exclude: Vec<String>,
+        is_case_sensitive: bool,
     ) -> Filter {
         Filter {
             extra_tl,
@@ -75,6 +77,7 @@ impl Filter {
             exclude,
             user_include,
             user_exclude,
+            is_case_sensitive,
         }
     }
 }
@@ -99,7 +102,11 @@ pub fn egosa(
     if settings.user_exclude.contains(&message.account.acct) {
         return false;
     }
-    let content = message.plain_content.unwrap_or(message.content);
+    let content = if settings.is_case_sensitive {
+        message.content
+    } else {
+        message.content.to_lowercase()
+    };
     if !settings.include.is_empty()
         && settings
             .include

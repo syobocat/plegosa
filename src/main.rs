@@ -69,13 +69,52 @@ async fn main() {
 
     let logging_url = dotenvy::var("LOGGER_URL").ok();
 
+    let is_case_sensitive: bool = if let Ok(case_sensitive) = dotenvy::var("CASE_SENSITIVE") {
+        match case_sensitive.to_lowercase().as_str() {
+            "true" => true,
+            "t" => true,
+            "yes" => true,
+            "y" => true,
+            "1" => true,
+            "false" => false,
+            "f" => false,
+            "no" => false,
+            "n" => false,
+            "0" => false,
+            _ => {
+                eprintln!("* The value of CASE_SENSITIVE doesn't match expected pattern!");
+                return;
+            }
+        }
+    } else {
+        true
+    };
+
     let include: Vec<String> = match dotenvy::var("INCLUDE") {
-        Ok(include) => include.split(',').map(|x| x.to_string()).collect(),
+        Ok(include) => {
+            if is_case_sensitive {
+                include.split(',').map(|x| x.to_string()).collect()
+            } else {
+                include
+                    .split(',')
+                    .map(|x| x.to_string().to_lowercase())
+                    .collect()
+            }
+        }
         Err(_) => vec![],
     };
 
     let exclude: Vec<String> = match dotenvy::var("EXCLUDE") {
-        Ok(exclude) => exclude.split(',').map(|x| x.to_string()).collect(),
+        Ok(exclude) => {
+            if is_case_sensitive {
+                exclude.split(',').map(|x| x.to_string()).collect()
+            } else {
+                exclude
+                    .split(',')
+                    .map(|x| x.to_string().to_lowercase())
+                    .collect()
+            }
+        }
         Err(_) => vec![],
     };
 
@@ -95,6 +134,7 @@ async fn main() {
         exclude,
         user_include,
         user_exclude,
+        is_case_sensitive,
     );
 
     info!("{:?}", token);
