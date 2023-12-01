@@ -17,6 +17,14 @@ pub async fn streaming(
     tl: Option<ExtraTimeline>,
 ) {
     let client = generator(sns, format!("https://{}", url), Some(token), None);
+    if tl.is_none() {
+        if client.verify_app_credentials().await.is_ok() {
+            println!("* Successfully connected!");
+        } else {
+            eprintln!("* Something went wrong! Aborting...");
+            return;
+        }
+    }
 
     let streaming = match tl {
         Some(ExtraTimeline::Public) => client.public_streaming(format!("wss://{}", url)),
