@@ -73,16 +73,28 @@ async fn main() {
 
     let logging_url = dotenvy::var("LOGGER_URL").ok();
 
-    let is_case_sensitive: bool = if let Ok(case_sensitive) = dotenvy::var("CASE_SENSITIVE") {
-        if let Ok(lb) = case_sensitive.parse::<LexicalBool>() {
+    let is_regex: bool = if let Ok(regex) = dotenvy::var("USE_REGEX") {
+        if let Ok(lb) = regex.parse::<LexicalBool>() {
             *lb.deref()
         } else {
-            eprintln!("* The value of CASE_SENSITIVE doesn't match expected pattern!");
+            eprintln!("* The value of USE_REGEX doesn't match expected pattern!");
             return;
         }
     } else {
-        true
+        false
     };
+
+    let is_case_sensitive: bool = !is_regex
+        && if let Ok(case_sensitive) = dotenvy::var("CASE_SENSITIVE") {
+            if let Ok(lb) = case_sensitive.parse::<LexicalBool>() {
+                *lb.deref()
+            } else {
+                eprintln!("* The value of CASE_SENSITIVE doesn't match expected pattern!");
+                return;
+            }
+        } else {
+            true
+        };
 
     let include: Vec<String> = match dotenvy::var("INCLUDE") {
         Ok(include) => {
@@ -122,14 +134,18 @@ async fn main() {
         Err(_) => vec![],
     };
 
-    let filter = logger::Filter::new(
+    let Ok(filter) = logger::Filter::new(
         extra_tl.clone(),
         include,
         exclude,
         user_include,
         user_exclude,
         is_case_sensitive,
-    );
+        is_regex,
+    ) else {
+        eprintln!("* Invalid regex syntax!");
+        return;
+    };
 
     info!("{:?}", token);
     info!("{:?}", filter);

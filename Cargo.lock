@@ -899,6 +899,7 @@ dependencies = [
  "log",
  "megalodon",
  "nanohtml2text",
+ "regex",
  "tokio",
  "ureq",
 ]

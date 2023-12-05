@@ -1,6 +1,7 @@
 use crate::streamer::ExtraTimeline;
 use kanaria::string::UCSStr;
 use nanohtml2text::html2text;
+use regex::Regex;
 
 #[derive(Clone)]
 pub struct Logger {
@@ -58,6 +59,8 @@ pub struct Filter {
     extra_tl: Option<ExtraTimeline>,
     include: Vec<String>,
     exclude: Vec<String>,
+    include_regex: Vec<Regex>,
+    exclude_regex: Vec<Regex>,
     user_include: Vec<String>,
     user_exclude: Vec<String>,
     is_case_sensitive: bool,
@@ -71,15 +74,45 @@ impl Filter {
         user_include: Vec<String>,
         user_exclude: Vec<String>,
         is_case_sensitive: bool,
-    ) -> Filter {
-        Filter {
+        is_regex: bool,
+    ) -> Result<Filter, &'static str> {
+        let include_plain: Vec<String>;
+        let exclude_plain: Vec<String>;
+        let mut include_regex: Vec<Regex>;
+        let mut exclude_regex: Vec<Regex>;
+        if is_regex {
+            include_plain = vec![];
+            exclude_plain = vec![];
+            include_regex = vec![];
+            exclude_regex = vec![];
+            for i in include {
+                let Ok(re) = Regex::new(i.as_str()) else {
+                    return Err("Invalid Regex");
+                };
+                include_regex.push(re);
+            }
+            for i in exclude {
+                let Ok(re) = Regex::new(i.as_str()) else {
+                    return Err("Invalid Regex");
+                };
+                exclude_regex.push(re);
+            }
+        } else {
+            include_plain = include;
+            exclude_plain = exclude;
+            include_regex = vec![];
+            exclude_regex = vec![];
+        }
+        Ok(Filter {
             extra_tl,
-            include,
-            exclude,
+            include: include_plain,
+            exclude: exclude_plain,
+            include_regex,
+            exclude_regex,
             user_include,
             user_exclude,
             is_case_sensitive,
-        }
+        })
     }
 }
 
@@ -126,6 +159,25 @@ pub fn egosa(
         .into_iter()
         .filter(|x| content.contains(x))
         .collect::<Vec<String>>()
+        .is_empty()
+    {
+        return false;
+    }
+    if !settings.include_regex.is_empty()
+        && settings
+            .include_regex
+            .into_iter()
+            .filter(|x| x.is_match(&content))
+            .collect::<Vec<Regex>>()
+            .is_empty()
+    {
+        return false;
+    }
+    if !settings
+        .exclude_regex
+        .into_iter()
+        .filter(|x| x.is_match(&content))
+        .collect::<Vec<Regex>>()
         .is_empty()
     {
         return false;
