@@ -1,4 +1,7 @@
+use std::ops::Deref;
+
 use kanaria::string::UCSStr;
+use lexical_bool::LexicalBool;
 use log::info;
 use megalodon::SNS;
 use streamer::ExtraTimeline;
@@ -71,21 +74,11 @@ async fn main() {
     let logging_url = dotenvy::var("LOGGER_URL").ok();
 
     let is_case_sensitive: bool = if let Ok(case_sensitive) = dotenvy::var("CASE_SENSITIVE") {
-        match case_sensitive.to_lowercase().as_str() {
-            "true" => true,
-            "t" => true,
-            "yes" => true,
-            "y" => true,
-            "1" => true,
-            "false" => false,
-            "f" => false,
-            "no" => false,
-            "n" => false,
-            "0" => false,
-            _ => {
-                eprintln!("* The value of CASE_SENSITIVE doesn't match expected pattern!");
-                return;
-            }
+        if let Ok(lb) = case_sensitive.parse::<LexicalBool>() {
+            *lb.deref()
+        } else {
+            eprintln!("* The value of CASE_SENSITIVE doesn't match expected pattern!");
+            return;
         }
     } else {
         true

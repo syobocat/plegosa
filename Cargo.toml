@@ -14,3 +14,4 @@ dotenvy = { version = "0.15" }
 ureq = { version = "2.9", features = ["json"] }
 nanohtml2text = { version = "0.1" }
 kanaria = { version = "0.2" }
+lexical_bool = { version = "0.1" }
