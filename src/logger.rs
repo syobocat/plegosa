@@ -121,6 +121,11 @@ pub fn egosa(
     settings: Filter,
     tl: Option<ExtraTimeline>,
 ) -> bool {
+    // Remove Repeats (a.k.a. Boosts)
+    if message.reblogged.unwrap_or_default() {
+        return false;
+    }
+
     // Remove dupicates from Home Timeline
     if tl.is_none() && message.visibility == megalodon::entities::StatusVisibility::Public {
         match settings.extra_tl {
