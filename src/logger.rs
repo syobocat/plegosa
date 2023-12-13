@@ -30,7 +30,7 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
                 ureq::json!({
                     "username": message.account.display_name,
                     "avatar_url": message.account.avatar,
-                    "content": format!("{}\nLink: {}", message.plain_content.unwrap_or(html2text(&message.content)), message.uri),
+                    "content": format!("{}\n=====\nLink: <{}>", message.plain_content.unwrap_or(html2text(&message.content)), message.uri),
                 })
             } else {
                 ureq::json!({
