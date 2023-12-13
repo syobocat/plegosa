@@ -20,19 +20,28 @@ pub async fn streaming(tl: Timeline) {
         None,
     );
     if matches!(tl, Timeline::Home) {
-        if client.verify_app_credentials().await.is_ok() {
-            println!("* Successfully connected!");
-        } else {
-            eprintln!("* Something went wrong! Aborting...");
+        if client.verify_app_credentials().await.is_err() {
+            eprintln!("* Token is invalid. Aborting...");
             return;
         }
     }
 
-    let streaming = match tl {
-        Timeline::Public => client.public_streaming(format!("wss://{}", config.instance_url)),
-        Timeline::Local => client.local_streaming(format!("wss://{}", config.instance_url)),
-        Timeline::Home => client.user_streaming(format!("wss://{}", config.instance_url)),
+    let (streaming, timeline_type) = match tl {
+        Timeline::Public => (
+            client.public_streaming(format!("wss://{}", config.instance_url)),
+            "Public",
+        ),
+        Timeline::Local => (
+            client.local_streaming(format!("wss://{}", config.instance_url)),
+            "Local",
+        ),
+        Timeline::Home => (
+            client.user_streaming(format!("wss://{}", config.instance_url)),
+            "Home",
+        ),
     };
+
+    println!("* Successfully connected to {} timeline!", timeline_type);
 
     streaming
         .listen(Box::new(move |message| {
