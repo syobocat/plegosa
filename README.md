@@ -15,7 +15,7 @@ INSTANCE_URL=インスタンスのURL(例:pleroma.social)
 ACCESS_TOKEN=アクセストークン(わからなければ空行にしておくと生成してくれます、設定は手動)
 LOGGER=ヒットした投稿の出力先(現状stdoutとDiscordにのみ対応)
 LOGGER_URL=DiscordのWebhook URL(LOGGERがDiscordの場合のみ)
-EXTRA_TIMELINE=追加で監視対象にするタイムライン(PublicまたはLocal)
+TIMELINES=監視対象にするタイムライン(Home、PublicまたはLocalから複数選択可)
 CASE_SENSITIVE=大文字/小文字、ひらがな/カタカナを区別する(true/false、デフォルト:true)
 USE_REGEX=有効時、INCLUDEとEXCLUDEは正規表現として扱われます(true/false、デフォルト:false)
 INCLUDE=ヒットさせたい単語(カンマ区切り、空の場合全てにヒットします)
@@ -24,21 +24,12 @@ USER_INCLUDE=ヒットさせたいユーザー(カンマ区切り、空の場合
 USER_EXCLUDE=ヒットさせたくないユーザー(カンマ区切り、自分の投稿を除外したいときなど)
 ```
 
-`EXTRA_TIMELINE`の挙動について
-
-1. 未設定の場合、HTLのみを監視します。
-
-2. Publicが指定されている場合、HTLに加えてGTL(「すべてのネットワーク」(Pleroma)、「連合タイムライン」(Mastodon))も監視します。(GTLが使用できるサーバーのみ)
-
-3. Localが指定されている場合、HTLに加えてLTL(「公開タイムライン」(Pleroma))も監視します。(LTLが使用できるサーバーのみ)
-
-
 # Known issues
-
-- リピート(ブースト)のユーザー表記がおかしい  
-  対処法がわからなかったので放置
   
 - ソースコードが汚い  
-  はい…
+  ちょっとずつマシになっているようないないような…
+
+- 設定ファイルの破壊的変更大杉  
+  もうちょっとしたら安定します
 
 Contributeお待ちしております。

@@ -1,23 +1,25 @@
+use crate::filter;
+use crate::logger;
 use log::error;
 use megalodon::{generator, streaming::Message};
 
 #[derive(Clone, Debug)]
-pub enum ExtraTimeline {
-    Public,
+pub enum Timeline {
+    Home,
     Local,
+    Public,
 }
 
-pub async fn streaming(
-    sns: megalodon::SNS,
-    url: String,
-    token: String,
-    output_dest: String,
-    logging_url: Option<String>,
-    filter: crate::logger::Filter,
-    tl: Option<ExtraTimeline>,
-) {
-    let client = generator(sns, format!("https://{}", url), Some(token), None);
-    if tl.is_none() {
+pub async fn streaming(tl: Timeline) {
+    let config = crate::config::CONFIG.get().unwrap();
+
+    let client = generator(
+        config.software.clone(),
+        format!("https://{}", config.instance_url),
+        Some(config.token.clone()),
+        None,
+    );
+    if matches!(tl, Timeline::Home) {
         if client.verify_app_credentials().await.is_ok() {
             println!("* Successfully connected!");
         } else {
@@ -27,18 +29,16 @@ pub async fn streaming(
     }
 
     let streaming = match tl {
-        Some(ExtraTimeline::Public) => client.public_streaming(format!("wss://{}", url)),
-        Some(ExtraTimeline::Local) => client.local_streaming(format!("wss://{}", url)),
-        None => client.user_streaming(format!("wss://{}", url)),
+        Timeline::Public => client.public_streaming(format!("wss://{}", config.instance_url)),
+        Timeline::Local => client.local_streaming(format!("wss://{}", config.instance_url)),
+        Timeline::Home => client.user_streaming(format!("wss://{}", config.instance_url)),
     };
-
-    let logger = crate::logger::Logger::new(output_dest, logging_url);
 
     streaming
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
-                if crate::logger::egosa(mes.clone(), filter.clone(), tl.clone()) {
-                    if let Err(e) = logger.clone().log(mes) {
+                if filter::filter(mes.clone(), tl.clone()) {
+                    if let Err(e) = logger::log(mes) {
                         error!("{}", e);
                     };
                 }
