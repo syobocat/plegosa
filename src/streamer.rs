@@ -19,11 +19,9 @@ pub async fn streaming(tl: Timeline) {
         Some(config.token.clone()),
         None,
     );
-    if matches!(tl, Timeline::Home) {
-        if client.verify_app_credentials().await.is_err() {
-            eprintln!("* Token is invalid. Aborting...");
-            return;
-        }
+    if matches!(tl, Timeline::Home) && client.verify_app_credentials().await.is_err() {
+        eprintln!("* Token is invalid. Aborting...");
+        return;
     }
 
     let (streaming, timeline_type) = match tl {
