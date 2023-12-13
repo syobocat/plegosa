@@ -17,6 +17,7 @@ async fn main() {
 
     // Home Timeline
     let home_tl_handle = if timelines.home {
+        println!("* Connecting to Home timeline...");
         tokio::spawn(streamer::streaming(Timeline::Home))
     } else {
         tokio::spawn(async {})
@@ -24,13 +25,15 @@ async fn main() {
 
     // Local Timeline
     let local_tl_handle = if timelines.local {
+        println!("* Connecting to Local timeline...");
         tokio::spawn(streamer::streaming(Timeline::Local))
     } else {
         tokio::spawn(async {})
     };
 
     // Public Timeline
-    let public_tl_handle = if timelines.local {
+    let public_tl_handle = if timelines.public {
+        println!("* Connecting to Public timeline...");
         tokio::spawn(streamer::streaming(Timeline::Public))
     } else {
         tokio::spawn(async {})

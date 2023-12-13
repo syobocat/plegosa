@@ -1,10 +1,12 @@
 use kanaria::string::UCSStr;
 use lexical_bool::LexicalBool;
+use log::info;
 use megalodon::SNS;
 use regex::Regex;
 use std::ops::Deref;
 use std::sync::OnceLock;
 
+#[derive(Debug)]
 pub struct Config {
     pub software: SNS,
     pub instance_url: String,
@@ -80,6 +82,7 @@ impl Filter {
     }
 }
 
+#[derive(Debug)]
 pub struct Logger {
     pub logger_type: String,
     pub logger_url: Option<String>,
@@ -94,6 +97,7 @@ impl Logger {
     }
 }
 
+#[derive(Debug)]
 pub struct TimelineSetting {
     pub home: bool,
     pub local: bool,
@@ -262,27 +266,17 @@ pub async fn load_config() -> Result<(), String> {
         return Err("* invalid regex syntax!".to_string());
     };
 
-    if CONFIG
-        .set(Config::new(software, instance_url, token))
-        .is_err()
-    {
-        return Err("* Failed to load config file!".to_string());
-    }
+    let _config = CONFIG.get_or_init(|| Config::new(software, instance_url, token));
 
-    if FILTER.set(filter).is_err() {
-        return Err("* Failed to load config file!".to_string());
-    }
+    let _filter = FILTER.get_or_init(|| filter);
 
-    if LOGGER
-        .set(Logger::new(logging_method, logging_url))
-        .is_err()
-    {
-        return Err("* Failed to load config file!".to_string());
-    }
+    let _logger = LOGGER.get_or_init(|| Logger::new(logging_method, logging_url));
 
-    if TIMELINES.set(timelines).is_err() {
-        return Err("* Failed to load config file!".to_string());
-    }
+    let _timelines = TIMELINES.get_or_init(|| timelines);
+    info!("{:?}", _config);
+    info!("{:?}", _filter);
+    info!("{:?}", _logger);
+    info!("{:?}", _timelines);
 
     Ok(())
 }
