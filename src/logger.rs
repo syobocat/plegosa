@@ -1,11 +1,17 @@
 use megalodon::entities::StatusVisibility;
 use nanohtml2text::html2text;
 
+#[derive(Debug)]
+pub enum LoggerType {
+    Stdout,
+    Discord,
+}
+
 pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static str> {
     let logger = crate::config::LOGGER.get().unwrap();
 
-    match logger.logger_type.to_lowercase().as_str() {
-        "stdout" => {
+    match logger.logger_type {
+        LoggerType::Stdout => {
             log::debug!("{:?}", message);
             println!("==========");
             println!(
@@ -20,7 +26,7 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
             println!("URL: {}", message.uri);
             Ok(())
         }
-        "discord" => {
+        LoggerType::Discord => {
             let Some(webhook) = logger.logger_url.clone() else {
                     return Err("* Please set Webhook URL to LOGGER_URL.");
                 };
@@ -43,6 +49,5 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
                 Ok(())
             }
         }
-        _ => Err("* Unkown logger."),
     }
 }

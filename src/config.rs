@@ -1,3 +1,4 @@
+use crate::logger::LoggerType;
 use kanaria::string::UCSStr;
 use lexical_bool::LexicalBool;
 use log::info;
@@ -14,12 +15,39 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(software: SNS, instance_url: String, token: String) -> Self {
-        Config {
+    pub fn new(
+        software_name: String,
+        instance_url: String,
+        token: String,
+    ) -> Result<Config, String> {
+        let software = match software_name.to_lowercase().as_str() {
+            "pleroma" => SNS::Pleroma,
+            "mastodon" => {
+                eprintln!("* Software other than Pleroma is not tested!");
+                SNS::Mastodon
+            }
+            "firefish" => {
+                eprintln!("* Software other than Pleroma is not tested!");
+                SNS::Firefish
+            }
+            "friendica" => {
+                eprintln!("* Software other than Pleroma is not tested!");
+                SNS::Friendica
+            }
+            unsupported => {
+                return Err(format!("* Software {} is unknown!", unsupported));
+            }
+        };
+        if token.is_empty() {
+            eprintln!("* ACCESS_TOKEN is not set. Generating...");
+            let _ = crate::streamer::oath(software, instance_url.as_str());
+            return Err(String::new());
+        }
+        Ok(Config {
             software,
             instance_url,
             token,
-        }
+        })
     }
 }
 
@@ -84,12 +112,20 @@ impl Filter {
 
 #[derive(Debug)]
 pub struct Logger {
-    pub logger_type: String,
+    pub logger_type: LoggerType,
     pub logger_url: Option<String>,
 }
 
 impl Logger {
-    pub fn new(logger_type: String, logger_url: Option<String>) -> Self {
+    pub fn new(logger_name: String, logger_url: Option<String>) -> Logger {
+        let logger_type = match logger_name.to_lowercase().as_str() {
+            "stdout" => LoggerType::Stdout,
+            "discord" => LoggerType::Discord,
+            _ => {
+                eprintln!("* LOGGER is not set. Falling back to stdout.");
+                LoggerType::Stdout
+            }
+        };
         Logger {
             logger_type,
             logger_url,
@@ -121,50 +157,21 @@ pub static TIMELINES: OnceLock<TimelineSetting> = OnceLock::new();
 
 // Read options from .env file
 pub async fn load_config() -> Result<(), String> {
-    let software = match dotenvy::var("SOFTWARE") {
-        Err(_) => {
+    // Parse CONFIG
+    let Ok(software) = dotenvy::var("SOFTWARE") else {
             return Err("* SOFTWARE is not set; Please specify SOFTWARE to listen to.".to_string());
-        }
-        Ok(software) => match software.to_lowercase().as_str() {
-            "pleroma" => SNS::Pleroma,
-            "mastodon" => {
-                eprintln!("* Software other than Pleroma is not tested!");
-                SNS::Mastodon
-            }
-            "firefish" => {
-                eprintln!("* Software other than Pleroma is not tested!");
-                SNS::Firefish
-            }
-            "friendica" => {
-                eprintln!("* Software other than Pleroma is not tested!");
-                SNS::Friendica
-            }
-            unsupported => {
-                return Err(format!("* Software {} is unknown!", unsupported));
-            }
-        },
     };
-
     let Ok(instance_url) = dotenvy::var("INSTANCE_URL") else {
         return Err("* Please specify INSTANCE_URL to listen to.".to_string());
     };
+    let token = dotenvy::var("ACCESS_TOKEN").unwrap_or_default();
 
-    let Ok(token) = dotenvy::var("ACCESS_TOKEN") else {
-        eprintln!("* ACCESS_TOKEN is not set. Generating...");
-        crate::streamer::oath(software, instance_url.as_str()).await;
-        return Err(String::new());
-    };
-
-    let logging_method = match dotenvy::var("LOGGER") {
-        Ok(l) => l,
-        Err(_) => {
-            eprintln!("* LOGGER is not set. Falling back to stdout.");
-            "stdout".to_string()
-        }
-    };
-
+    // Parse LOGGER
+    let logging_method = dotenvy::var("LOGGER").unwrap_or_default();
     let logging_url = dotenvy::var("LOGGER_URL").ok();
 
+    // Parse FILTER
+    // TODO?: Parse in new() function instead of here?
     let is_regex: bool = if let Ok(regex) = dotenvy::var("USE_REGEX") {
         if let Ok(lb) = regex.parse::<LexicalBool>() {
             *lb.deref()
@@ -255,22 +262,22 @@ pub async fn load_config() -> Result<(), String> {
         Err(_) => vec![],
     };
 
-    let Ok(filter) = Filter::new(
+    // Setting
+    let config = Config::new(software, instance_url, token)?;
+    let _config = CONFIG.get_or_init(|| config);
+
+    let filter = Filter::new(
         include,
         exclude,
         user_include,
         user_exclude,
         is_case_sensitive,
         is_regex,
-    ) else {
-        return Err("* invalid regex syntax!".to_string());
-    };
-
-    let _config = CONFIG.get_or_init(|| Config::new(software, instance_url, token));
-
+    )?;
     let _filter = FILTER.get_or_init(|| filter);
 
-    let _logger = LOGGER.get_or_init(|| Logger::new(logging_method, logging_url));
+    let logger = Logger::new(logging_method, logging_url);
+    let _logger = LOGGER.get_or_init(|| logger);
 
     let _timelines = TIMELINES.get_or_init(|| timelines);
     info!("{:?}", _config);
