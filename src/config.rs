@@ -15,7 +15,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(
+    pub async fn new(
         software_name: String,
         instance_url: String,
         token: String,
@@ -40,7 +40,7 @@ impl Config {
         };
         if token.is_empty() {
             eprintln!("* ACCESS_TOKEN is not set. Generating...");
-            let _ = crate::streamer::oath(software, instance_url.as_str());
+            crate::streamer::oath(software, instance_url.as_str()).await;
             return Err(String::new());
         }
         Ok(Config {
@@ -263,7 +263,7 @@ pub async fn load_config() -> Result<(), String> {
     };
 
     // Setting
-    let config = Config::new(software, instance_url, token)?;
+    let config = Config::new(software, instance_url, token).await?;
     let _config = CONFIG.get_or_init(|| config);
 
     let filter = Filter::new(
