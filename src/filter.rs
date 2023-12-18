@@ -17,7 +17,11 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
     if matches!(tl, Timeline::Home) && message.visibility == StatusVisibility::Public {
         match timeline_setting {
             TimelineSetting { public: true, .. } => return false,
-            TimelineSetting { local: true, .. } => return message.account.acct.contains('@'),
+            TimelineSetting { local: true, .. } => {
+                if !message.account.acct.contains('@') {
+                    return false;
+                }
+            }
             _ => {}
         };
     }
