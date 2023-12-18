@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  push:
+    tags: [ "*" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build - ${{ matrix.platform.release_for }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - release_for: Linux-x86_64-musl
+            os: ubuntu-20.04
+            target: x86_64-unknown-linux-musl
+            ext: ""
+            command: build
+
+          - release_for: Linux-x86_64-gnu
+            os: ubuntu-20.04
+            target: x86_64-unknown-linux-gnu
+            ext: ""
+            command: build
+            
+          - release_for: FreeBSD-x86_64
+            os: ubuntu-20.04
+            target: x86_64-unknown-freebsd
+            ext: ""
+            command: build
+
+          - release_for: NetBSD-x86_64
+            os: ubuntu-20.04
+            target: x86_64-unknown-netbsd
+            ext: ""
+            command: build
+
+          - release_for: Windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: .exe
+            command: build
+
+          - release_for: macOS-x86_64
+            os: macOS-latest
+            target: x86_64-apple-darwin
+            ext: ""
+            command: build
+
+          - release_for: macOS-aarch64
+            os: macOS-latest
+            target: aarch64-apple-darwin
+            ext: ""
+            command: build
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install musl-tools
+        run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
+        if: contains(matrix.platform.release_for, 'musl')
+      - name: Build
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: ${{ matrix.platform.command }}
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release"
+          strip: true
+      - name: Publish release artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: plegosa_${{ matrix.platform.release_for }}
+          path: target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+      - name: Rename executable file
+        run: mv target/${{ matrix.platform.target }}/release/plegosa${{ matrix.platform.ext }} plegosa_${{ matrix.platform.release_for }}${{ matrix.platform.ext }}
+      - name: Generate SHA-256
+        run: shasum -a 256 plegosa_${{ matrix.platform.release_for }}${{ matrix.platform.ext }}
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: "plegosa_${{ matrix.platform.release_for }}${{ matrix.platform.ext }}"
