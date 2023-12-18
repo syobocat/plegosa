@@ -1,7 +1,11 @@
 [package]
 name = "plegosa"
 version = "0.1.0"
+authors = ["SyoBoN <syobon@syo.bar>"]
 edition = "2021"
+description = "A simple Egosa (ego-search) tool for Pleroma"
+repository = "https://github.com/syobocat/plegosa/"
+license-file = "LICENSE"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
