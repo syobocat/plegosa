@@ -75,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: plegosa_${{ matrix.platform.release_for }}
-          path: target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+          path: target/${{ matrix.platform.target }}/release/plegosa${{ matrix.platform.ext }}
       - name: Rename executable file
         run: mv target/${{ matrix.platform.target }}/release/plegosa${{ matrix.platform.ext }} plegosa_${{ matrix.platform.release_for }}${{ matrix.platform.ext }}
       - name: Generate SHA-256
