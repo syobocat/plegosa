@@ -1,6 +1,6 @@
 [package]
 name = "plegosa"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["SyoBoN <syobon@syo.bar>"]
 edition = "2021"
 description = "A simple Egosa (ego-search) tool for Pleroma"
