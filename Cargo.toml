@@ -20,4 +20,6 @@ nanohtml2text = { version = "0.1" }
 kanaria = { version = "0.2" }
 lexical_bool = { version = "0.1" }
 regex = { version = "1" }
+
+[target.x86_64-unknown-linux-musl.dependencies]
 openssl = { version = "0.10", features = ["vendored"] }
