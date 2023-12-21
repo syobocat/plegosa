@@ -1,0 +1,47 @@
+name: Build Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Build Target'
+        required: true
+        default: 'x86_64-unkown-linux-gnu'
+        type: choice
+        options:
+          - x86_64-unknown-linux-musl
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-freebsd
+          - x86_64-unknown-netbsd
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+      builder:
+        description: 'Builder OS'
+        required: true
+        default: 'ubuntu-latest'
+        type: choice
+        options:
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
+ 
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build check - ${{ inputs.target }}
+    runs-on: ${{ inputs.builder }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install musl-tools
+        run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
+        if: contains(inputs.target, 'musl')
+      - name: Build
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: build
+          target: ${{ inputs.target }}
+          args: "--locked --release"
