@@ -13,9 +13,9 @@ on:
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-freebsd
           - x86_64-unknown-netbsd
-          - x86_64-unknown-openbsd # Not working right now
-          - x86_64-unknown-dragonfly
-          - x86_64-unknown-illumos
+          - x86_64-unknown-openbsd # Currently not working (rust-std is missing)
+          - x86_64-unknown-dragonfly # Currently not working (rust-std is missing)
+          - x86_64-unknown-illumos # Currently not working (granlib: not found)
           - x86_64-sun-solaris
           - x86_64-pc-windows-msvc
           - x86_64-apple-darwin
