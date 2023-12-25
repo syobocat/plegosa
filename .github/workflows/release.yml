@@ -69,7 +69,7 @@ jobs:
         with:
           command: ${{ matrix.platform.command }}
           target: ${{ matrix.platform.target }}
-          args: "--locked --release"
+          args: "--locked --release --features 'static-openssl'"
           strip: true
       - name: Publish release artifacts
         uses: actions/upload-artifact@v3
