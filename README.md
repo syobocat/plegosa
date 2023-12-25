@@ -4,6 +4,17 @@ Pleromaに移住した結果Misskeyのアンテナが恋しくなってしまっ
 
 Plegosaという名前ですがおそらくMastodonでも動きます。FriendicaでもFirefishでも動きます。たぶん。
 
+# 依存関係を教えて
+
+- ビルド時依存
+  - rust
+  - gmake (`static-openssl`が有効の場合)
+  - perl (`static-openssl`が有効の場合)
+- 実行時依存
+  - openssl (`static-openssl`が無効の場合)
+
+たぶんこれで全部。
+
 # どう使うの
 
 `.env`ファイルを作って以下の情報を書きこめばOKです。環境変数でも問題ありませんが衝突防止の点から`.env`が好ましいでしょう。  
@@ -12,7 +23,7 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 ```
 SOFTWARE=ソフトウェア名(例:Pleroma)
 INSTANCE_URL=インスタンスのURL(例:pleroma.social)
-ACCESS_TOKEN=アクセストークン(わからなければ空行にしておくと生成してくれます、設定は手動)
+ACCESS_TOKEN=アクセストークン(わからなければ空にしておくと生成してくれます、設定は手動)
 LOGGER=ヒットした投稿の出力先(現状stdoutとDiscordにのみ対応)
 LOGGER_URL=DiscordのWebhook URL(LOGGERがDiscordの場合のみ)
 TIMELINES=監視対象にするタイムライン(Home、PublicまたはLocalから複数選択可)
