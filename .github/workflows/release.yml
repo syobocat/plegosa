@@ -21,9 +21,21 @@ jobs:
             ext: ""
             command: build
 
+          - release_for: Linux-aarch64-musl
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            ext: ""
+            command: build
+
           - release_for: Linux-x86_64-gnu
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            ext: ""
+            command: build
+
+          - release_for: linux-aarch64-gnu
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
             ext: ""
             command: build
             
