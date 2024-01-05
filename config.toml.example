@@ -21,4 +21,5 @@ enable = true # Whether to write hit log to Standard Output (Default: true)
 
 [logger.discord]
 enable = false # Whether to Write hit log to Discord (Default: false)
+use_embed = false # Send as Embed instead of link (Default: false)
 webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # Webhook URL

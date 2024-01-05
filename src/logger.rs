@@ -1,6 +1,8 @@
 use crate::config::CONFIG;
-use megalodon::entities::StatusVisibility;
+use html2md::parse_html;
+use megalodon::entities::{attachment::AttachmentType, StatusVisibility};
 use nanohtml2text::html2text;
+use ureq::json;
 
 pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static str> {
     let logger = &CONFIG.get().unwrap().logger;
@@ -24,11 +26,47 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
         let message = message.clone();
         let json = if message.visibility == StatusVisibility::Private
             || message.visibility == StatusVisibility::Direct
+            || logger.discord.use_embed
         {
+            let mut images = vec![];
+            for attachment in message
+                .media_attachments
+                .iter()
+                .filter(|x| matches!(x.r#type, AttachmentType::Image))
+                // Discord accepts up to 10 embeds
+                .take(10)
+            {
+                images.push(json!({
+                    "url": attachment.url,
+                }));
+            }
+
+            let mut embeds = vec![];
+
+            // Create an embed containing the message's content
+            embeds.push(json!({
+                "description": parse_html(&message.content).replace("[https://", "[").replace("\\#", "#").replace("\\_", "_"), // Workarounds for Discord's stupid Markdown parser
+                "url": message.uri,
+                "timestamp": message.created_at.to_rfc3339(),
+                "author": {
+                    "name": message.uri,
+                    "url": message.uri,
+                },
+                // Set first image if exist, leave empty if not
+                "image": images.get(0).unwrap_or(&json!({})),
+            }));
+
+            // Create an embed for each remaining images
+            for image in images.into_iter().skip(1) {
+                embeds.push(json!({
+                    "url": message.uri,
+                    "image": image,
+                }));
+            }
             ureq::json!({
                 "username": message.account.display_name,
                 "avatar_url": message.account.avatar,
-                "content": format!("{}\n=====\nLink: <{}>", message.plain_content.unwrap_or(html2text(&message.content)), message.uri),
+                "embeds": embeds,
             })
         } else {
             ureq::json!({

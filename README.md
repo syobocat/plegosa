@@ -44,6 +44,7 @@ enable = true # ヒットログを標準出力に書き込むかどうか (デ�
 
 [logger.discord]
 enable = false # ヒットログをDiscordに送信するかどうか (デフォルト: false)
+use_embed = false # リンクを直貼りするのではなくEmbedとして送信する(公開範囲によってはfalseでもEmbedとして送信されます) (デフォルト: false)
 webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # WebhookのURL
 ```
 

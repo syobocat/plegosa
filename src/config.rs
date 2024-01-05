@@ -85,11 +85,22 @@ impl Default for Stdout {
     }
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(default)]
 pub struct Discord {
     pub enable: bool,
     pub webhook: String,
+    pub use_embed: bool,
+}
+
+impl Default for Discord {
+    fn default() -> Self {
+        Self {
+            enable: false,
+            webhook: String::new(),
+            use_embed: true,
+        }
+    }
 }
 
 pub static CONFIG: OnceLock<Config> = OnceLock::new();

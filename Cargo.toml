@@ -21,8 +21,9 @@ kanaria = { version = "0.2" }
 lexical_bool = { version = "0.1" }
 regex = { version = "1" }
 openssl = { version = "0.10" }
-toml = { version = "0.8.8" }
-serde = "1.0.194"
+toml = { version = "0.8" }
+serde = { version = "1" }
+fast_html2md = { version = "0.0" }
 
 [features]
 default = []
