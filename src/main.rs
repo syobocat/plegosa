@@ -1,3 +1,4 @@
+use config::CONFIG;
 use streamer::Timeline;
 
 mod config;
@@ -13,7 +14,7 @@ async fn main() {
         return;
     };
 
-    let timelines = config::TIMELINES.get().unwrap();
+    let timelines = &CONFIG.get().unwrap().timelines;
 
     // Home Timeline
     let home_tl_handle = if timelines.home {

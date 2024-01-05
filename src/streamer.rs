@@ -1,3 +1,4 @@
+use crate::config::CONFIG;
 use crate::filter;
 use crate::logger;
 use log::error;
@@ -25,12 +26,12 @@ fn get_history() -> &'static Mutex<Vec<String>> {
 }
 
 pub async fn streaming(tl: Timeline) {
-    let config = crate::config::CONFIG.get().unwrap();
+    let config = &CONFIG.get().unwrap().instance;
 
     let client = generator(
         config.software.clone(),
-        format!("https://{}", config.instance_url),
-        Some(config.token.clone()),
+        format!("https://{}", config.url),
+        config.token.clone(),
         None,
     );
     if matches!(tl, Timeline::Home) && client.verify_app_credentials().await.is_err() {
@@ -40,15 +41,15 @@ pub async fn streaming(tl: Timeline) {
 
     let (streaming, timeline_type) = match tl {
         Timeline::Public => (
-            client.public_streaming(format!("wss://{}", config.instance_url)),
+            client.public_streaming(format!("wss://{}", config.url)),
             "Public",
         ),
         Timeline::Local => (
-            client.local_streaming(format!("wss://{}", config.instance_url)),
+            client.local_streaming(format!("wss://{}", config.url)),
             "Local",
         ),
         Timeline::Home => (
-            client.user_streaming(format!("wss://{}", config.instance_url)),
+            client.user_streaming(format!("wss://{}", config.url)),
             "Home",
         ),
     };
@@ -58,11 +59,13 @@ pub async fn streaming(tl: Timeline) {
     streaming
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
+                info!("Message received.");
                 let mut history = get_history().lock().unwrap();
                 if filter::filter(mes.clone(), tl.clone()) && !history.contains(&mes.clone().id) {
+                    info!("Filter passed.");
                     history.rotate_right(1);
                     history[0] = mes.clone().id;
-                    info!("{:?}", history);
+                    info!("History: {history:?}");
                     if let Err(e) = logger::log(mes) {
                         error!("{}", e);
                     };

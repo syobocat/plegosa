@@ -17,22 +17,34 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 
 # どう使うの
 
-`.env`ファイルを作って以下の情報を書きこめばOKです。環境変数でも問題ありませんが衝突防止の点から`.env`が好ましいでしょう。  
-`USER_*`でのユーザーの書式は`@hoge@example.tld`ではなく`hoge@example.tld`なので注意してください。なお、ローカルのユーザーの場合は`@example.tld`すら不要で`hoge`のみです。
+`config.toml`ファイルを作って以下の情報を書きこめばOKです。  
+`user_*`でのユーザーの書式は`@hoge@example.tld`ではなく`hoge@example.tld`なので注意してください。なお、ローカルのユーザーの場合は`@example.tld`すら不要で`hoge`のみです。
 
-```
-SOFTWARE=ソフトウェア名(例:Pleroma)
-INSTANCE_URL=インスタンスのURL(例:pleroma.social)
-ACCESS_TOKEN=アクセストークン(わからなければ空にしておくと生成してくれます、設定は手動)
-LOGGER=ヒットした投稿の出力先(現状stdoutとDiscordにのみ対応)
-LOGGER_URL=DiscordのWebhook URL(LOGGERがDiscordの場合のみ)
-TIMELINES=監視対象にするタイムライン(Home、PublicまたはLocalから複数選択可)
-CASE_SENSITIVE=大文字/小文字、ひらがな/カタカナを区別する(true/false、デフォルト:true)
-USE_REGEX=有効時、INCLUDEとEXCLUDEは正規表現として扱われます(true/false、デフォルト:false)
-INCLUDE=ヒットさせたい単語(カンマ区切り、空の場合全てにヒットします)
-EXCLUDE=ヒットさせたくない単語(カンマ区切り)
-USER_INCLUDE=ヒットさせたいユーザー(カンマ区切り、空の場合全ユーザーにヒットします)
-USER_EXCLUDE=ヒットさせたくないユーザー(カンマ区切り、自分の投稿を除外したいときなど)
+```toml
+[instance]
+software = 'Pleroma' # ソフトウェア名
+url = 'pleroma.social' # インスタンスのURL
+token = 'xxxxxxxxxxxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxx' # アクセストークン(timelines.homeがtrueの時のみ必須、わからなければ空にしておくと生成してくれます、設定は手動)
+
+[timelines]
+home = true    # ホームタイムラインを監視するかどうか (デフォルト: true)
+local = false  # ローカルタイムラインを監視するかどうか (デフォルト: false)
+public = false # グローバルタイムラインを監視するかどうか (デフォルト: false)
+
+[filter]
+case_sensitive = true # include, excludeで大文字/小文字、ひらがな/カタカナを区別するかどうか (デフォルト: true)
+use_regex = false # include, excludeを正規表現として扱うかどうか (デフォルト: false)
+include = [] # ヒットさせたい単語(空の場合全てにヒットします)
+exclude = [] # 除外したい単語
+user_include = [] # ヒットさせたいユーザー(空の場合全ユーザーにヒットします)
+user_exclude = [] # ヒットさせたくないユーザー(自分の投稿を除外したいときなど)
+
+[logger.stdout]
+enable = true # ヒットログを標準出力に書き込むかどうか (デフォルト: true)
+
+[logger.discord]
+enable = false # ヒットログをDiscordに送信するかどうか (デフォルト: false)
+webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # WebhookのURL
 ```
 
 # Known issues

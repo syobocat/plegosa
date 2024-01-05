@@ -1,0 +1,24 @@
+[instance]
+software = 'Pleroma' # Software name
+url = 'pleroma.social' # Instance URL
+token = 'xxxxxxxxxxxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxx' # Access token (Optional when timelines.home is false)
+
+[timelines]
+home = true    # Whether to watch Home Timeline (Default: true)
+local = false  # Whether to watch Local Timeline (a.k.a. Public Timeline in Pleroma) (Default: false)
+public = false # Whether to watch Public Timeline (a.k.a. Known Network in Pleroma, or Federated Timeline in Mastodon) (Default: false)
+
+[filter]
+case_sensitive = true # (Default: true)
+use_regex = false # (Default: false)
+include = [] # Words to include (Everything when empty) (Default: empty)
+exclude = [] # Words to exclude (Default: empty)
+user_include = [] # Authors to include (Everyone when empty) (Default: empty)
+user_exclude = [] # Authors to exclude (Default: empty)
+
+[logger.stdout]
+enable = true # Whether to write hit log to Standard Output (Default: true)
+
+[logger.discord]
+enable = false # Whether to Write hit log to Discord (Default: false)
+webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # Webhook URL

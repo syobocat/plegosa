@@ -1,12 +1,13 @@
 use crate::config::TimelineSetting;
+use crate::config::CONFIG;
 use crate::streamer::Timeline;
 use kanaria::string::UCSStr;
 use megalodon::entities::StatusVisibility;
 use regex::Regex;
 
 pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> bool {
-    let filter = crate::config::FILTER.get().unwrap();
-    let timeline_setting = crate::config::TIMELINES.get().unwrap();
+    let config = CONFIG.get().unwrap();
+    let filter = config.filter.clone();
 
     // Remove Repeats (a.k.a. Boosts)
     if message.reblogged.unwrap_or_default() {
@@ -15,7 +16,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
 
     // Remove dupicates from Home Timeline
     if matches!(tl, Timeline::Home) && message.visibility == StatusVisibility::Public {
-        match timeline_setting {
+        match config.timelines {
             TimelineSetting { public: true, .. } => return false,
             TimelineSetting { local: true, .. } => {
                 if !message.account.acct.contains('@') {
@@ -32,55 +33,66 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
     if filter.user_exclude.contains(&message.account.acct) {
         return false;
     }
-    let content = if filter.is_case_sensitive {
-        message.content
+    let (content, include, exclude) = if filter.case_sensitive {
+        (message.content, filter.include, filter.exclude)
     } else {
-        UCSStr::from_str(message.content.as_str())
-            .lower_case()
-            .hiragana()
-            .to_string()
+        (
+            UCSStr::from_str(message.content.as_str())
+                .lower_case()
+                .hiragana()
+                .to_string(),
+            filter
+                .include
+                .clone()
+                .into_iter()
+                .map(|x| UCSStr::from_str(&x).lower_case().hiragana().to_string())
+                .collect(),
+            filter
+                .exclude
+                .into_iter()
+                .map(|x| UCSStr::from_str(&x).lower_case().hiragana().to_string())
+                .collect(),
+        )
     };
-    if !filter.include.is_empty()
-        && filter
-            .include
-            .clone()
+    if filter.use_regex {
+        if !include.is_empty()
+            && include
+                .into_iter()
+                .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
+                .filter(|x| x.is_match(&content))
+                .collect::<Vec<Regex>>()
+                .is_empty()
+        {
+            return false;
+        }
+        if !exclude
+            .into_iter()
+            .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
+            .filter(|x| x.is_match(&content))
+            .collect::<Vec<Regex>>()
+            .is_empty()
+        {
+            return false;
+        }
+    } else {
+        if !include.is_empty()
+            && include
+                .into_iter()
+                .filter(|x| content.contains(x))
+                .collect::<Vec<String>>()
+                .is_empty()
+        {
+            return false;
+        }
+        if !exclude
             .into_iter()
             .filter(|x| content.contains(x))
             .collect::<Vec<String>>()
             .is_empty()
-    {
-        return false;
+        {
+            return false;
+        }
     }
-    if !filter
-        .exclude
-        .clone()
-        .into_iter()
-        .filter(|x| content.contains(x))
-        .collect::<Vec<String>>()
-        .is_empty()
-    {
-        return false;
-    }
-    if !filter.include_regex.is_empty()
-        && filter
-            .include_regex
-            .clone()
-            .into_iter()
-            .filter(|x| x.is_match(&content))
-            .collect::<Vec<Regex>>()
-            .is_empty()
-    {
-        return false;
-    }
-    if !filter
-        .exclude_regex
-        .clone()
-        .into_iter()
-        .filter(|x| x.is_match(&content))
-        .collect::<Vec<Regex>>()
-        .is_empty()
-    {
-        return false;
-    }
+
     true
 }
