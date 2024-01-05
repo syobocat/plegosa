@@ -10,7 +10,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
     let filter = config.filter.clone();
 
     // Remove Repeats (a.k.a. Boosts)
-    if message.reblogged.unwrap_or_default() {
+    if message.reblog.is_some() {
         return false;
     }
 

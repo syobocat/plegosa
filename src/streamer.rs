@@ -4,25 +4,12 @@ use crate::logger;
 use log::error;
 use log::info;
 use megalodon::{generator, streaming::Message};
-use std::sync::{Mutex, OnceLock};
 
 #[derive(Clone, Debug)]
 pub enum Timeline {
     Home,
     Local,
     Public,
-}
-
-// Workaround for #10
-static HISTORY: OnceLock<Mutex<Vec<String>>> = OnceLock::new();
-fn get_history() -> &'static Mutex<Vec<String>> {
-    HISTORY.get_or_init(|| {
-        let mut vec = Vec::with_capacity(20);
-        for _ in 0..20 {
-            vec.push(String::new());
-        }
-        Mutex::new(vec)
-    })
 }
 
 pub async fn streaming(tl: Timeline) {
@@ -60,12 +47,8 @@ pub async fn streaming(tl: Timeline) {
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
                 info!("Message received.");
-                let mut history = get_history().lock().unwrap();
-                if filter::filter(mes.clone(), tl.clone()) && !history.contains(&mes.clone().id) {
+                if filter::filter(mes.clone(), tl.clone()) {
                     info!("Filter passed.");
-                    history.rotate_right(1);
-                    history[0] = mes.clone().id;
-                    info!("History: {history:?}");
                     if let Err(e) = logger::log(mes) {
                         error!("{}", e);
                     };
