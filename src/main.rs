@@ -9,8 +9,8 @@ mod streamer;
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    if let Err(e) = config::load_config().await {
-        eprintln!("{}", e);
+    if let Err(e) = config::load().await {
+        eprintln!("{e}");
         return;
     };
 

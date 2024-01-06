@@ -47,7 +47,7 @@ pub async fn streaming(tl: Timeline) {
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
                 info!("Message received.");
-                if filter::filter(mes.clone(), tl.clone()) {
+                if filter::filter(mes.clone(), &tl) {
                     info!("Filter passed.");
                     if let Err(e) = logger::log(mes) {
                         error!("{e}");
@@ -60,7 +60,7 @@ pub async fn streaming(tl: Timeline) {
 
 // Generate access token
 pub async fn oath(sns: megalodon::SNS, url: &str) {
-    let client = generator(sns, format!("https://{}", url), None, None);
+    let client = generator(sns, format!("https://{url}"), None, None);
     let options = megalodon::megalodon::AppInputOptions {
         scopes: Some([String::from("read")].to_vec()),
         ..Default::default()
@@ -97,12 +97,12 @@ pub async fn oath(sns: megalodon::SNS, url: &str) {
                     */
                 }
                 Err(err) => {
-                    println!("{:#?}", err);
+                    println!("{err:#?}");
                 }
             }
         }
         Err(err) => {
-            println!("{:#?}", err);
+            println!("{err:#?}");
         }
     }
 }

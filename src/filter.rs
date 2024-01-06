@@ -5,7 +5,7 @@ use kanaria::string::UCSStr;
 use megalodon::entities::StatusVisibility;
 use regex::Regex;
 
-pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> bool {
+pub fn filter(message: megalodon::entities::status::Status, tl: &Timeline) -> bool {
     let config = CONFIG.get().unwrap();
     let filter = &config.filter;
 
@@ -63,37 +63,22 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
             && include
                 .into_iter()
                 .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
-                .filter(|x| x.is_match(&content))
-                .collect::<Vec<_>>()
-                .is_empty()
+                .any(|x| x.is_match(&content))
         {
             return false;
         }
         if !exclude
             .into_iter()
             .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
-            .filter(|x| x.is_match(&content))
-            .collect::<Vec<_>>()
-            .is_empty()
+            .any(|x| x.is_match(&content))
         {
             return false;
         }
     } else {
-        if !include.is_empty()
-            && include
-                .into_iter()
-                .filter(|x| content.contains(x))
-                .collect::<Vec<_>>()
-                .is_empty()
-        {
+        if !include.is_empty() && include.into_iter().any(|x| content.contains(&x)) {
             return false;
         }
-        if !exclude
-            .into_iter()
-            .filter(|x| content.contains(x))
-            .collect::<Vec<_>>()
-            .is_empty()
-        {
+        if !exclude.into_iter().any(|x| content.contains(&x)) {
             return false;
         }
     }

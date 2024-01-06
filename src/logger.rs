@@ -17,7 +17,9 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
         println!("Content:");
         println!(
             "{}",
-            message.plain_content.unwrap_or(html2text(&message.content))
+            message
+                .plain_content
+                .unwrap_or_else(|| html2text(&message.content))
         );
         println!("URL: {}", message.uri);
     }

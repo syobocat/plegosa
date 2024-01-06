@@ -105,13 +105,15 @@ impl Default for Discord {
 
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
-pub async fn load_config() -> Result<(), String> {
+pub async fn load() -> Result<(), String> {
     // Read options from config.toml file
     let Ok(toml) = fs::read_to_string("config.toml") else {
-        return Err(match Path::new(".env").exists() {
-            true => "* Obsolete .env config file found. Please migrate to config.toml.",
-            false => "* config.toml is not found.",
-        }.to_string());
+        return Err(if Path::new(".env").exists() {
+            "* Obsolete .env config file found. Please migrate to config.toml."
+        } else {
+            "* config.toml is not found."
+        }
+        .to_string());
     };
     let config: Config = match toml::from_str(&toml) {
         Ok(c) => c,
@@ -125,12 +127,12 @@ pub async fn load_config() -> Result<(), String> {
         return Err(String::new());
     }
     if config.filter.use_regex {
-        for exp in config.filter.include.iter() {
+        for exp in &config.filter.include {
             if Regex::new(exp).is_err() {
                 return Err("* filter.include contains a invalid regex.".to_string());
             }
         }
-        for exp in config.filter.exclude.iter() {
+        for exp in &config.filter.exclude {
             if Regex::new(exp).is_err() {
                 return Err("* filter.exclude contains a invalid regex.".to_string());
             }
