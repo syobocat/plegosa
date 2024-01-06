@@ -3,7 +3,8 @@ use crate::filter;
 use crate::logger;
 use log::error;
 use log::info;
-use megalodon::{generator, streaming::Message};
+use megalodon::{default::NO_REDIRECT, generator, megalodon::AppInputOptions, streaming::Message};
+use std::io;
 
 #[derive(Clone, Debug)]
 pub enum Timeline {
@@ -61,7 +62,7 @@ pub async fn streaming(tl: Timeline) {
 // Generate access token
 pub async fn oath(sns: megalodon::SNS, url: &str) {
     let client = generator(sns, format!("https://{url}"), None, None);
-    let options = megalodon::megalodon::AppInputOptions {
+    let options = AppInputOptions {
         scopes: Some([String::from("read")].to_vec()),
         ..Default::default()
     };
@@ -76,14 +77,14 @@ pub async fn oath(sns: megalodon::SNS, url: &str) {
 
             println!("\nEnter authorization code from website: ");
             let mut code = String::new();
-            std::io::stdin().read_line(&mut code).ok();
+            io::stdin().read_line(&mut code).ok();
 
             match client
                 .fetch_access_token(
                     client_id,
                     client_secret,
-                    code.trim().to_string(),
-                    megalodon::default::NO_REDIRECT.to_string(),
+                    code.trim().to_owned(),
+                    NO_REDIRECT.to_owned(),
                 )
                 .await
             {

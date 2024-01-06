@@ -1,3 +1,4 @@
+use crate::streamer;
 use log::info;
 use megalodon::SNS;
 use regex::Regex;
@@ -113,7 +114,7 @@ pub async fn load() -> Result<(), String> {
         } else {
             "* config.toml is not found."
         }
-        .to_string());
+        .to_owned());
     };
     let config: Config = match toml::from_str(&toml) {
         Ok(c) => c,
@@ -123,24 +124,24 @@ pub async fn load() -> Result<(), String> {
     // Validate options
     if config.timelines.home && config.instance.token.is_none() {
         eprintln!("* timelines.home is set, but instance.token is empty. Generating a token...");
-        crate::streamer::oath(config.instance.software, &config.instance.url).await;
+        streamer::oath(config.instance.software, &config.instance.url).await;
         return Err(String::new());
     }
     if config.filter.use_regex {
         for exp in &config.filter.include {
             if Regex::new(exp).is_err() {
-                return Err("* filter.include contains a invalid regex.".to_string());
+                return Err("* filter.include contains a invalid regex.".to_owned());
             }
         }
         for exp in &config.filter.exclude {
             if Regex::new(exp).is_err() {
-                return Err("* filter.exclude contains a invalid regex.".to_string());
+                return Err("* filter.exclude contains a invalid regex.".to_owned());
             }
         }
     }
     if config.logger.discord.enable && config.logger.discord.webhook.is_empty() {
         return Err(
-            "* logger.discord.enable is set, but logger.discord.webhook is empty.".to_string(),
+            "* logger.discord.enable is set, but logger.discord.webhook is empty.".to_owned(),
         );
     }
 

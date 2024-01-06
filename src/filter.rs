@@ -2,10 +2,10 @@ use crate::config::TimelineSetting;
 use crate::config::CONFIG;
 use crate::streamer::Timeline;
 use kanaria::string::UCSStr;
-use megalodon::entities::StatusVisibility;
+use megalodon::entities::{Status, StatusVisibility};
 use regex::Regex;
 
-pub fn filter(message: megalodon::entities::status::Status, tl: &Timeline) -> bool {
+pub fn filter(message: Status, tl: &Timeline) -> bool {
     let config = CONFIG.get().unwrap();
     let filter = &config.filter;
 
@@ -15,7 +15,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: &Timeline) -> bo
     }
 
     // Remove dupicates from Home Timeline
-    if matches!(tl, Timeline::Home) && matches!(message.visibility, StatusVisibility::Public) {
+    if matches!(tl, &Timeline::Home) && matches!(message.visibility, StatusVisibility::Public) {
         match config.timelines {
             TimelineSetting { public: true, .. } => return false,
             TimelineSetting { local: true, .. } => {

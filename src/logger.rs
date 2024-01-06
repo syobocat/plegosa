@@ -1,10 +1,10 @@
 use crate::config::CONFIG;
 use html2md::parse_html;
-use megalodon::entities::{attachment::AttachmentType, StatusVisibility};
+use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
 use nanohtml2text::html2text;
 use ureq::json;
 
-pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static str> {
+pub fn log(message: Status) -> Result<(), &'static str> {
     let logger = &CONFIG.get().unwrap().logger;
 
     if logger.stdout.enable {
