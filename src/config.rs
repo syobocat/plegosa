@@ -108,10 +108,9 @@ pub static CONFIG: OnceLock<Config> = OnceLock::new();
 pub async fn load_config() -> Result<(), String> {
     // Read options from config.toml file
     let Ok(toml) = fs::read_to_string("config.toml") else {
-        return Err(if Path::new(".env").exists() {
-            "* Obsolete .env config file found. Please migrate to config.toml."
-        } else {
-            "* config.toml is not found."
+        return Err(match Path::new(".env").exists() {
+            true => "* Obsolete .env config file found. Please migrate to config.toml.",
+            false => "* config.toml is not found.",
         }.to_string());
     };
     let config: Config = match toml::from_str(&toml) {

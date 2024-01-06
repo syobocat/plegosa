@@ -8,7 +8,6 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
     let logger = &CONFIG.get().unwrap().logger;
 
     if logger.stdout.enable {
-        let message = message.clone();
         log::debug!("{:?}", message);
         println!("==========");
         println!(
@@ -23,7 +22,6 @@ pub fn log(message: megalodon::entities::status::Status) -> Result<(), &'static 
         println!("URL: {}", message.uri);
     }
     if logger.discord.enable {
-        let message = message.clone();
         let json = if message.visibility == StatusVisibility::Private
             || message.visibility == StatusVisibility::Direct
             || logger.discord.use_embed

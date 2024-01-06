@@ -7,7 +7,7 @@ use regex::Regex;
 
 pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> bool {
     let config = CONFIG.get().unwrap();
-    let filter = config.filter.clone();
+    let filter = &config.filter;
 
     // Remove Repeats (a.k.a. Boosts)
     if message.reblog.is_some() {
@@ -15,7 +15,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
     }
 
     // Remove dupicates from Home Timeline
-    if matches!(tl, Timeline::Home) && message.visibility == StatusVisibility::Public {
+    if matches!(tl, Timeline::Home) && matches!(message.visibility, StatusVisibility::Public) {
         match config.timelines {
             TimelineSetting { public: true, .. } => return false,
             TimelineSetting { local: true, .. } => {
@@ -33,8 +33,13 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
     if filter.user_exclude.contains(&message.account.acct) {
         return false;
     }
+
     let (content, include, exclude) = if filter.case_sensitive {
-        (message.content, filter.include, filter.exclude)
+        (
+            message.content,
+            filter.include.clone(),
+            filter.exclude.clone(),
+        )
     } else {
         (
             UCSStr::from_str(message.content.as_str())
@@ -43,13 +48,12 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
                 .to_string(),
             filter
                 .include
-                .clone()
-                .into_iter()
+                .iter()
                 .map(|x| UCSStr::from_str(&x).lower_case().hiragana().to_string())
                 .collect(),
             filter
                 .exclude
-                .into_iter()
+                .iter()
                 .map(|x| UCSStr::from_str(&x).lower_case().hiragana().to_string())
                 .collect(),
         )
@@ -60,7 +64,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
                 .into_iter()
                 .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
                 .filter(|x| x.is_match(&content))
-                .collect::<Vec<Regex>>()
+                .collect::<Vec<_>>()
                 .is_empty()
         {
             return false;
@@ -69,7 +73,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
             .into_iter()
             .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
             .filter(|x| x.is_match(&content))
-            .collect::<Vec<Regex>>()
+            .collect::<Vec<_>>()
             .is_empty()
         {
             return false;
@@ -79,7 +83,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
             && include
                 .into_iter()
                 .filter(|x| content.contains(x))
-                .collect::<Vec<String>>()
+                .collect::<Vec<_>>()
                 .is_empty()
         {
             return false;
@@ -87,7 +91,7 @@ pub fn filter(message: megalodon::entities::status::Status, tl: Timeline) -> boo
         if !exclude
             .into_iter()
             .filter(|x| content.contains(x))
-            .collect::<Vec<String>>()
+            .collect::<Vec<_>>()
             .is_empty()
         {
             return false;

@@ -41,7 +41,7 @@ pub async fn streaming(tl: Timeline) {
         ),
     };
 
-    println!("* Successfully connected to {} timeline!", timeline_type);
+    println!("* Successfully connected to {timeline_type} timeline!");
 
     streaming
         .listen(Box::new(move |message| {
@@ -50,7 +50,7 @@ pub async fn streaming(tl: Timeline) {
                 if filter::filter(mes.clone(), tl.clone()) {
                     info!("Filter passed.");
                     if let Err(e) = logger::log(mes) {
-                        error!("{}", e);
+                        error!("{e}");
                     };
                 }
             }
