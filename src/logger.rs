@@ -48,10 +48,16 @@ pub fn log(message: Status) -> Result<(), &'static str> {
                 "description": parse_html(&message.content).replace("[https://", "[").replace("\\#", "#").replace("\\_", "_"), // Workarounds for Discord's stupid Markdown parser
                 "url": message.uri,
                 "timestamp": message.created_at.to_rfc3339(),
+                /*
+                // while using author field looks better,
+                // they aren't rendered as hyperlink on the mobile app.
                 "author": {
                     "name": message.uri,
                     "url": message.uri,
                 },
+                */
+                // So let's use title field instead.
+                "title": message.uri,
                 // Set first image if exist, leave empty if not
                 "image": images.get(0).unwrap_or(&json!({})),
             }));
