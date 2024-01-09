@@ -1008,7 +1008,7 @@ checksum = "69d3587f8a9e599cc7ec2c00e331f71c4e69a5f9a4b8a6efd5b07466b9736f9a"
 
 [[package]]
 name = "plegosa"
-version = "0.1.2"
+version = "0.2.0"
 dependencies = [
  "env_logger",
  "fast_html2md",
