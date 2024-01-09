@@ -7,6 +7,7 @@
 
 ## Added
 
+- Multiple logger support
 - Added an option to always use Discord embed
 - Added Linux AArch64 support
 
