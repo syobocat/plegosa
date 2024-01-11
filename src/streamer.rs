@@ -60,7 +60,7 @@ pub async fn streaming(tl: Timeline) {
 }
 
 // Generate access token
-pub async fn oath(sns: megalodon::SNS, url: &str) {
+pub async fn oauth(sns: megalodon::SNS, url: &str) {
     let client = generator(sns, format!("https://{url}"), None, None);
     let options = AppInputOptions {
         scopes: Some([String::from("read")].to_vec()),

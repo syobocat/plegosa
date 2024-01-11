@@ -124,7 +124,7 @@ pub async fn load() -> Result<(), String> {
     // Validate options
     if config.timelines.home && config.instance.token.is_none() {
         eprintln!("* timelines.home is set, but instance.token is empty. Generating a token...");
-        streamer::oath(config.instance.software, &config.instance.url).await;
+        streamer::oauth(config.instance.software, &config.instance.url).await;
         return Err(String::new());
     }
     if config.filter.use_regex {
