@@ -13,7 +13,7 @@ license-file = "LICENSE"
 megalodon = { version = "0.11" }
 tokio = { version = "1" }
 log = { version = "0.4" }
-env_logger = { version = "0.10" }
+env_logger = { version = "0.11" }
 ureq = { version = "2", features = ["json"] }
 nanohtml2text = { version = "0.1" }
 kanaria = { version = "0.2" }
