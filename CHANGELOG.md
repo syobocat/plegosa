@@ -1,3 +1,9 @@
+# v0.2.1
+
+## Fixed
+
+- `exclude` is now working properly
+
 # v0.2.0
 
 ## Changed
