@@ -78,7 +78,7 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install musl-tools
         run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
         if: contains(matrix.platform.release_for, 'musl')
@@ -90,7 +90,7 @@ jobs:
           args: "--locked --release --features 'static-openssl'"
           strip: true
       - name: Publish release artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plegosa_${{ matrix.platform.release_for }}
           path: target/${{ matrix.platform.target }}/release/plegosa${{ matrix.platform.ext }}
