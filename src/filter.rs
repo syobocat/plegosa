@@ -68,7 +68,7 @@ pub fn filter(message: Status, tl: &Timeline) -> (bool, String) {
     };
     if filter.use_regex {
         if !include.is_empty()
-            && include
+            && !include
                 .into_iter()
                 .map(|x| Regex::new(&x).unwrap()) // We can use unwrap() here as we have already checked they're all valid regex.
                 .any(|x| x.is_match(&content))
@@ -83,7 +83,7 @@ pub fn filter(message: Status, tl: &Timeline) -> (bool, String) {
             return (false, "The message contains exclude".to_owned());
         }
     } else {
-        if !include.is_empty() && include.into_iter().any(|x| content.contains(&x)) {
+        if !include.is_empty() && !include.into_iter().any(|x| content.contains(&x)) {
             return (false, "The message does not contain include".to_owned());
         }
         if exclude.into_iter().any(|x| content.contains(&x)) {
