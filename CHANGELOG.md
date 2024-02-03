@@ -1,3 +1,9 @@
+# v0.2.2
+
+## Fixed
+
+- `include` is now working properly
+
 # v0.2.1
 
 ## Fixed
