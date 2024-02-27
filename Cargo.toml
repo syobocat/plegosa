@@ -22,6 +22,7 @@ openssl = { version = "0.10" }
 toml = { version = "0.8" }
 serde = { version = "1" }
 fast_html2md = { version = "0.0" }
+unicode-normalization = { version = "0.1" }
 
 [features]
 default = []

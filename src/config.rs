@@ -6,6 +6,7 @@ use serde::Deserialize;
 use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
+use unicode_normalization::UnicodeNormalization;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -116,7 +117,7 @@ pub async fn load() -> Result<(), String> {
         }
         .to_owned());
     };
-    let config: Config = match toml::from_str(&toml) {
+    let mut config: Config = match toml::from_str(&toml) {
         Ok(c) => c,
         Err(e) => return Err(format!("* Failed to load config.toml: {:?}", e.message())),
     };
@@ -143,6 +144,35 @@ pub async fn load() -> Result<(), String> {
         return Err(
             "* logger.discord.enable is set, but logger.discord.webhook is empty.".to_owned(),
         );
+    }
+
+    // Normalize
+    if config.filter.case_sensitive {
+        config.filter.include = config
+            .filter
+            .include
+            .iter()
+            .map(|x| x.nfc().collect())
+            .collect();
+        config.filter.exclude = config
+            .filter
+            .exclude
+            .iter()
+            .map(|x| x.nfc().collect())
+            .collect();
+    } else {
+        config.filter.include = config
+            .filter
+            .include
+            .iter()
+            .map(|x| x.nfkc().collect())
+            .collect();
+        config.filter.exclude = config
+            .filter
+            .exclude
+            .iter()
+            .map(|x| x.nfkc().collect())
+            .collect();
     }
 
     // Store options

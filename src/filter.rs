@@ -4,6 +4,7 @@ use crate::streamer::Timeline;
 use kanaria::string::UCSStr;
 use megalodon::entities::{Status, StatusVisibility};
 use regex::Regex;
+use unicode_normalization::UnicodeNormalization;
 
 pub fn filter(message: Status, tl: &Timeline) -> (bool, String) {
     let config = CONFIG.get().unwrap();
@@ -42,9 +43,9 @@ pub fn filter(message: Status, tl: &Timeline) -> (bool, String) {
         return (false, "The author is in user_exclude".to_owned());
     }
 
-    let (content, include, exclude) = if filter.case_sensitive {
+    let (content, include, exclude): (String, Vec<_>, Vec<_>) = if filter.case_sensitive {
         (
-            message.content,
+            message.content.nfc().collect(),
             filter.include.clone(),
             filter.exclude.clone(),
         )
@@ -53,7 +54,9 @@ pub fn filter(message: Status, tl: &Timeline) -> (bool, String) {
             UCSStr::from_str(message.content.as_str())
                 .lower_case()
                 .hiragana()
-                .to_string(),
+                .to_string()
+                .nfkc()
+                .collect(),
             filter
                 .include
                 .iter()
