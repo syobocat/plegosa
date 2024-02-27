@@ -10,19 +10,19 @@ license-file = "LICENSE"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-megalodon = { version = "0.11" }
-tokio = { version = "1" }
-log = { version = "0.4" }
 env_logger = { version = "0.11" }
-ureq = { version = "2", features = ["json"] }
-nanohtml2text = { version = "0.1" }
-kanaria = { version = "0.2" }
-regex = { version = "1" }
-openssl = { version = "0.10" }
-toml = { version = "0.8" }
-serde = { version = "1" }
 fast_html2md = { version = "0.0" }
+kanaria = { version = "0.2" }
+log = { version = "0.4" }
+megalodon = { version = "0.11" }
+nanohtml2text = { version = "0.1" }
+openssl = { version = "0.10" }
+regex = { version = "1" }
+serde = { version = "1" }
+tokio = { version = "1" }
+toml = { version = "0.8" }
 unicode-normalization = { version = "0.1" }
+ureq = { version = "2", features = ["json"] }
 
 [features]
 default = []
