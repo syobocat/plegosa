@@ -7,7 +7,7 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 # 依存関係を教えて
 
 - ビルド時依存
-  - rust
+  - rust >= 1.76
   - gmake (`static-openssl`が有効の場合)
   - perl (`static-openssl`が有効の場合)
 - 実行時依存
@@ -32,7 +32,7 @@ local = false  # ローカルタイムラインを監視するかどうか (デ�
 public = false # グローバルタイムラインを監視するかどうか (デフォルト: false)
 
 [filter]
-case_sensitive = true # include, excludeで大文字/小文字、ひらがな/カタカナを区別するかどうか (デフォルト: true)
+case_sensitive = true # include, excludeで大文字/小文字、ひらがな/カタカナ及び互換等価な字を区別するかどうか(falseでも正準等価な字は区別しません) (デフォルト: true)
 use_regex = false # include, excludeを正規表現として扱うかどうか (デフォルト: false)
 include = [] # ヒットさせたい単語(空の場合全てにヒットします)
 exclude = [] # 除外したい単語
