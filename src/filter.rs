@@ -6,7 +6,7 @@ use megalodon::entities::{Status, StatusVisibility};
 use regex::Regex;
 use unicode_normalization::UnicodeNormalization;
 
-pub fn filter(message: Status, tl: &Timeline) -> (bool, String) {
+pub fn filter(message: &Status, tl: &Timeline) -> (bool, String) {
     let config = CONFIG.get().unwrap();
     let filter = &config.filter;
 

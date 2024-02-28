@@ -1,6 +1,7 @@
 use crate::config::CONFIG;
 use crate::filter;
 use crate::logger;
+use crate::utils::{die, die_with_error, success};
 use log::error;
 use log::info;
 use megalodon::{default::NO_REDIRECT, generator, megalodon::AppInputOptions, streaming::Message};
@@ -23,8 +24,7 @@ pub async fn streaming(tl: Timeline) {
         None,
     );
     if matches!(tl, Timeline::Home) && client.verify_app_credentials().await.is_err() {
-        eprintln!("* Token is invalid. Aborting...");
-        return;
+        die("* Token is invalid. Aborting...");
     }
 
     let (streaming, timeline_type) = match tl {
@@ -42,18 +42,18 @@ pub async fn streaming(tl: Timeline) {
         ),
     };
 
-    println!("* Successfully connected to {timeline_type} timeline!");
+    success(format!(
+        "Successfully connected to {timeline_type} timeline!"
+    ));
 
     streaming
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
                 info!("Message received.");
-                let (result, reason) = filter::filter(mes.clone(), &tl);
+                let (result, reason) = filter::filter(&mes, &tl);
                 if result {
                     info!("Message passed the filter.");
-                    if let Err(e) = logger::log(mes) {
-                        error!("{e}");
-                    };
+                    let _ = logger::log(mes).inspect_err(|e| error!("* {e}"));
                 } else {
                     info!("Message did not pass the filter. Reason: {reason}");
                 }
@@ -75,7 +75,7 @@ pub async fn oauth(sns: megalodon::SNS, url: &str) {
         Ok(app_data) => {
             let client_id = app_data.client_id;
             let client_secret = app_data.client_secret;
-            println!("* Authorization URL is generated.\n");
+            success("Authorization URL is generated.\n");
             println!("{}", app_data.url.unwrap());
 
             println!("\nEnter authorization code from website: ");
@@ -92,7 +92,8 @@ pub async fn oauth(sns: megalodon::SNS, url: &str) {
                 .await
             {
                 Ok(token_data) => {
-                    println!("\n* Access token has generated. Please add this to .env file.\n");
+                    println!();
+                    success("Access token has generated. Please add this to .env file.\n");
                     println!("ACCESS_TOKEN={}", token_data.access_token);
                     /*
                     if let Some(refresh) = token_data.refresh_token {
@@ -101,12 +102,12 @@ pub async fn oauth(sns: megalodon::SNS, url: &str) {
                     */
                 }
                 Err(err) => {
-                    println!("{err:#?}");
+                    die_with_error("Error", err);
                 }
             }
         }
         Err(err) => {
-            println!("{err:#?}");
+            die_with_error("Error", err);
         }
     }
 }

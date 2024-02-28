@@ -4,7 +4,7 @@ use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
 use nanohtml2text::html2text;
 use ureq::json;
 
-pub fn log(message: Status) -> Result<(), &'static str> {
+pub fn log(message: Status) -> Result<(), Box<dyn std::error::Error>> {
     let logger = &CONFIG.get().unwrap().logger;
 
     if logger.stdout.enable {
@@ -59,7 +59,7 @@ pub fn log(message: Status) -> Result<(), &'static str> {
                 // So let's use title field instead.
                 "title": message.uri,
                 // Set first image if exist, leave empty if not
-                "image": images.get(0).unwrap_or(&json!({})),
+                "image": images.first().unwrap_or(&json!({})),
             }));
 
             // Create an embed for each remaining images
@@ -79,9 +79,9 @@ pub fn log(message: Status) -> Result<(), &'static str> {
                 "content": message.uri,
             })
         };
-        if ureq::post(&logger.discord.webhook).send_json(json).is_err() {
-            return Err("* Something happend executing Webhook.");
-        }
+        ureq::post(&logger.discord.webhook)
+            .send_json(json)
+            .map_err(|e| format!("Error while executing webhook: {e}"))?;
     }
     Ok(())
 }

@@ -1,18 +1,17 @@
 use config::CONFIG;
 use streamer::Timeline;
+use utils::die_with_error;
 
 mod config;
 mod filter;
 mod logger;
 mod streamer;
+mod utils;
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    if let Err(e) = config::load().await {
-        eprintln!("{e}");
-        return;
-    };
+    config::load().await;
 
     let timelines = &CONFIG.get().unwrap().timelines;
 
@@ -40,5 +39,6 @@ async fn main() {
         tokio::spawn(async {})
     };
 
-    let _ = tokio::join!(home_tl_handle, local_tl_handle, public_tl_handle);
+    tokio::try_join!(home_tl_handle, local_tl_handle, public_tl_handle)
+        .unwrap_or_else(|e| die_with_error("Failed to spawn process", e));
 }

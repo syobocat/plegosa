@@ -1,10 +1,10 @@
 use crate::streamer;
+use crate::utils::{die, die_with_error};
 use log::info;
 use megalodon::SNS;
 use regex::Regex;
 use serde::Deserialize;
 use std::fs;
-use std::path::Path;
 use std::sync::OnceLock;
 use unicode_normalization::UnicodeNormalization;
 
@@ -107,43 +107,33 @@ impl Default for Discord {
 
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
-pub async fn load() -> Result<(), String> {
+pub async fn load() {
     // Read options from config.toml file
-    let Ok(toml) = fs::read_to_string("config.toml") else {
-        return Err(if Path::new(".env").exists() {
-            "* Obsolete .env config file found. Please migrate to config.toml."
-        } else {
-            "* config.toml is not found."
-        }
-        .to_owned());
-    };
-    let mut config: Config = match toml::from_str(&toml) {
-        Ok(c) => c,
-        Err(e) => return Err(format!("* Failed to load config.toml: {:?}", e.message())),
-    };
+    let toml = fs::read_to_string("config.toml")
+        .unwrap_or_else(|e| die_with_error("Failed to read config.toml", e));
+    let mut config: Config =
+        toml::from_str(&toml).unwrap_or_else(|e| die_with_error("Failed to parse config.toml", e));
 
     // Validate options
     if config.timelines.home && config.instance.token.is_none() {
         eprintln!("* timelines.home is set, but instance.token is empty. Generating a token...");
         streamer::oauth(config.instance.software, &config.instance.url).await;
-        return Err(String::new());
+        std::process::exit(0);
     }
     if config.filter.use_regex {
         for exp in &config.filter.include {
             if Regex::new(exp).is_err() {
-                return Err("* filter.include contains a invalid regex.".to_owned());
+                die("filter.include contains a invalid regex.");
             }
         }
         for exp in &config.filter.exclude {
             if Regex::new(exp).is_err() {
-                return Err("* filter.exclude contains a invalid regex.".to_owned());
+                die("filter.exclude contains a invalid regex.");
             }
         }
     }
     if config.logger.discord.enable && config.logger.discord.webhook.is_empty() {
-        return Err(
-            "* logger.discord.enable is set, but logger.discord.webhook is empty.".to_owned(),
-        );
+        die("logger.discord.enable is set, but logger.discord.webhook is empty.");
     }
 
     // Normalize
@@ -178,6 +168,4 @@ pub async fn load() -> Result<(), String> {
     // Store options
     let config = CONFIG.get_or_init(|| config);
     info!("{:?}", config);
-
-    Ok(())
 }
