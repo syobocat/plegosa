@@ -99,7 +99,7 @@ jobs:
       - name: Generate SHA-256
         run: shasum -a 256 plegosa_${{ matrix.platform.release_for }}${{ matrix.platform.ext }}
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: "plegosa_${{ matrix.platform.release_for }}${{ matrix.platform.ext }}"
