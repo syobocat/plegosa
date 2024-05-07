@@ -1,3 +1,13 @@
+# v0.2.3
+
+## Added
+
+- Added unicode normalization support
+
+## Removed
+
+- Removed Solaris 10 support (Solaris 11 support is currently unavailable)
+
 # v0.2.2
 
 ## Fixed
