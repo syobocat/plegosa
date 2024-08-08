@@ -1,6 +1,6 @@
 [package]
 name = "plegosa"
-version = "0.2.3"
+version = "0.3.0"
 authors = ["SyoBoN <syobon@syobon.net>"]
 edition = "2021"
 rust-version = "1.80"
