@@ -23,23 +23,17 @@ pub async fn streaming(tl: Timeline) {
         config.token.clone(),
         None,
     );
-    if matches!(tl, Timeline::Home) && client.verify_app_credentials().await.is_err() {
-        die("* Token is invalid. Aborting...");
+    if matches!(tl, Timeline::Home)
+        && client.verify_account_credentials().await.is_err()
+        && client.verify_app_credentials().await.is_err()
+    {
+        die("Token is invalid. Aborting...");
     }
 
     let (streaming, timeline_type) = match tl {
-        Timeline::Public => (
-            client.public_streaming(format!("wss://{}", config.url)),
-            "Public",
-        ),
-        Timeline::Local => (
-            client.local_streaming(format!("wss://{}", config.url)),
-            "Local",
-        ),
-        Timeline::Home => (
-            client.user_streaming(format!("wss://{}", config.url)),
-            "Home",
-        ),
+        Timeline::Public => (client.public_streaming().await, "Public"),
+        Timeline::Local => (client.local_streaming().await, "Local"),
+        Timeline::Home => (client.user_streaming().await, "Home"),
     };
 
     success(format!(
@@ -93,8 +87,8 @@ pub async fn oauth(sns: megalodon::SNS, url: &str) {
             {
                 Ok(token_data) => {
                     println!();
-                    success("Access token has generated. Please add this to .env file.\n");
-                    println!("ACCESS_TOKEN={}", token_data.access_token);
+                    success("Access token has generated. Please add this to config.toml file.\n");
+                    println!("token = {}", token_data.access_token);
                     /*
                     if let Some(refresh) = token_data.refresh_token {
                         println!("refresh_token: {}", refresh);

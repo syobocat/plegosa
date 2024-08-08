@@ -1,7 +1,7 @@
 [instance]
 software = 'Pleroma' # Software name
 url = 'pleroma.social' # Instance URL
-token = 'xxxxxxxxxxxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxx' # Access token (Optional when timelines.home is false)
+token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # Access token (Optional when timelines.home is false)
 
 [timelines]
 home = true    # Whether to watch Home Timeline (Default: true)
