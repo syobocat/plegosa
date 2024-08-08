@@ -1,11 +1,10 @@
 use crate::streamer;
 use crate::utils::{die, die_with_error};
-use log::info;
 use megalodon::SNS;
 use regex::Regex;
 use serde::Deserialize;
 use std::fs;
-use std::sync::OnceLock;
+use std::sync::LazyLock;
 use unicode_normalization::UnicodeNormalization;
 
 #[derive(Debug, Deserialize)]
@@ -105,36 +104,14 @@ impl Default for Discord {
     }
 }
 
-pub static CONFIG: OnceLock<Config> = OnceLock::new();
+pub static CONFIG: LazyLock<Config> = LazyLock::new(load);
 
-pub async fn load() {
+fn load() -> Config {
     // Read options from config.toml file
     let toml = fs::read_to_string("config.toml")
         .unwrap_or_else(|e| die_with_error("Failed to read config.toml", e));
     let mut config: Config =
         toml::from_str(&toml).unwrap_or_else(|e| die_with_error("Failed to parse config.toml", e));
-
-    // Validate options
-    if config.timelines.home && config.instance.token.is_none() {
-        eprintln!("* timelines.home is set, but instance.token is empty. Generating a token...");
-        streamer::oauth(config.instance.software, &config.instance.url).await;
-        std::process::exit(0);
-    }
-    if config.filter.use_regex {
-        for exp in &config.filter.include {
-            if Regex::new(exp).is_err() {
-                die("filter.include contains a invalid regex.");
-            }
-        }
-        for exp in &config.filter.exclude {
-            if Regex::new(exp).is_err() {
-                die("filter.exclude contains a invalid regex.");
-            }
-        }
-    }
-    if config.logger.discord.enable && config.logger.discord.webhook.is_empty() {
-        die("logger.discord.enable is set, but logger.discord.webhook is empty.");
-    }
 
     // Normalize
     if config.filter.case_sensitive {
@@ -165,7 +142,28 @@ pub async fn load() {
             .collect();
     }
 
-    // Store options
-    let config = CONFIG.get_or_init(|| config);
-    info!("{:?}", config);
+    config
+}
+
+pub async fn validate() {
+    if CONFIG.timelines.home && CONFIG.instance.token.is_none() {
+        eprintln!("* timelines.home is set, but instance.token is empty. Generating a token...");
+        streamer::oauth(CONFIG.instance.software.clone(), &CONFIG.instance.url).await;
+        std::process::exit(0);
+    }
+    if CONFIG.filter.use_regex {
+        for exp in &CONFIG.filter.include {
+            if Regex::new(exp).is_err() {
+                die("filter.include contains a invalid regex.");
+            }
+        }
+        for exp in &CONFIG.filter.exclude {
+            if Regex::new(exp).is_err() {
+                die("filter.exclude contains a invalid regex.");
+            }
+        }
+    }
+    if CONFIG.logger.discord.enable && CONFIG.logger.discord.webhook.is_empty() {
+        die("logger.discord.enable is set, but logger.discord.webhook is empty.");
+    }
 }

@@ -5,7 +5,7 @@ use nanohtml2text::html2text;
 use ureq::json;
 
 pub fn log(message: Status) -> Result<(), Box<dyn std::error::Error>> {
-    let logger = &CONFIG.get().unwrap().logger;
+    let logger = &CONFIG.logger;
 
     if logger.stdout.enable {
         log::debug!("{:?}", message);

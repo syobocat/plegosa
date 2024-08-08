@@ -11,9 +11,10 @@ mod utils;
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    config::load().await;
 
-    let timelines = &CONFIG.get().unwrap().timelines;
+    config::validate().await;
+
+    let timelines = &CONFIG.timelines;
 
     // Home Timeline
     let home_tl_handle = if timelines.home {
@@ -40,5 +41,5 @@ async fn main() {
     };
 
     tokio::try_join!(home_tl_handle, local_tl_handle, public_tl_handle)
-        .unwrap_or_else(|e| die_with_error("Failed to spawn process", e));
+        .unwrap_or_else(|e| die_with_error("Failed to spawn processes", e));
 }

@@ -15,7 +15,7 @@ pub enum Timeline {
 }
 
 pub async fn streaming(tl: Timeline) {
-    let config = &CONFIG.get().unwrap().instance;
+    let config = &CONFIG.instance;
 
     let client = generator(
         config.software.clone(),
@@ -50,12 +50,12 @@ pub async fn streaming(tl: Timeline) {
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
                 info!("Message received.");
-                let (result, reason) = filter::filter(&mes, &tl);
-                if result {
+                let result = filter::filter(&mes, &tl);
+                if let Err(reason) = result {
+                    info!("Message did not pass the filter. Reason: {reason}");
+                } else {
                     info!("Message passed the filter.");
                     let _ = logger::log(mes).inspect_err(|e| error!("* {e}"));
-                } else {
-                    info!("Message did not pass the filter. Reason: {reason}");
                 }
             }
         }))
