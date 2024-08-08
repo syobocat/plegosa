@@ -2,8 +2,7 @@ use crate::config::CONFIG;
 use crate::filter;
 use crate::logger;
 use crate::utils::{die, die_with_error, success};
-use log::error;
-use log::info;
+use log::{debug, error, info};
 use megalodon::{default::NO_REDIRECT, generator, megalodon::AppInputOptions, streaming::Message};
 use std::io;
 
@@ -44,6 +43,7 @@ pub async fn streaming(tl: Timeline) {
         .listen(Box::new(move |message| {
             if let Message::Update(mes) = message {
                 info!("Message received.");
+                debug!("{mes:?}");
                 let result = filter::filter(&mes, &tl);
                 if let Err(reason) = result {
                     info!("Message did not pass the filter. Reason: {reason}");

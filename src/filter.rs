@@ -10,8 +10,8 @@ pub fn filter(message: &Status, tl: &Timeline) -> Result<(), String> {
     let timelines = &CONFIG.timelines;
     let filter = &CONFIG.filter;
 
-    // Remove Repeats (a.k.a. Boosts)
-    if message.reblog.is_some() {
+    // Remove Repeats (a.k.a. Boosts), but pass Quotes
+    if message.reblog.is_some() && !message.quote {
         return Err("The message is the repeat".to_owned());
     }
 
