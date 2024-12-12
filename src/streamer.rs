@@ -16,12 +16,14 @@ pub enum Timeline {
 pub async fn streaming(tl: Timeline) {
     let config = &CONFIG.instance;
 
-    let client = generator(
+    let Ok(client) = generator(
         config.software.clone(),
         format!("https://{}", config.url),
         config.token.clone(),
         None,
-    );
+    ) else {
+        die("Failed to build a client. Aborting...");
+    };
     if matches!(tl, Timeline::Home)
         && client.verify_account_credentials().await.is_err()
         && client.verify_app_credentials().await.is_err()
@@ -58,7 +60,9 @@ pub async fn streaming(tl: Timeline) {
 
 // Generate access token
 pub async fn oauth(sns: megalodon::SNS, url: &str) {
-    let client = generator(sns, format!("https://{url}"), None, None);
+    let Ok(client) = generator(sns, format!("https://{url}"), None, None) else {
+        die("Failed to build a client. Aborting...");
+    };
     let options = AppInputOptions {
         scopes: Some([String::from("read")].to_vec()),
         ..Default::default()

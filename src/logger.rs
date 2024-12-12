@@ -1,5 +1,5 @@
 use crate::config::CONFIG;
-use html2md::parse_html;
+use html2md::rewrite_html;
 use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
 use nanohtml2text::html2text;
 use ureq::json;
@@ -45,7 +45,7 @@ pub fn log(message: Status) -> Result<(), Box<dyn std::error::Error>> {
 
             // Create an embed containing the message's content
             embeds.push(json!({
-                "description": parse_html(&message.content).replace("[https://", "[").replace("\\#", "#").replace("\\_", "_"), // Workarounds for Discord's stupid Markdown parser
+                "description": rewrite_html(&message.content, false).replace("[https://", "[").replace("\\#", "#").replace("\\_", "_"), // Workarounds for Discord's stupid Markdown parser
                 "url": message.uri,
                 "timestamp": message.created_at.to_rfc3339(),
                 /*
