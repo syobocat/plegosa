@@ -43,17 +43,22 @@ pub async fn streaming(tl: Timeline) {
 
     streaming
         .listen(Box::new(move |message| {
-            if let Message::Update(mes) = message {
-                info!("Message received.");
-                debug!("{mes:?}");
-                let result = filter::filter(&mes, &tl);
-                if let Err(reason) = result {
-                    info!("Message did not pass the filter. Reason: {reason}");
-                } else {
-                    info!("Message passed the filter.");
-                    let _ = logger::log(mes).inspect_err(|e| error!("* {e}"));
+            let tl = tl.clone();
+            Box::pin({
+                async move {
+                    if let Message::Update(mes) = message {
+                        info!("Message received.");
+                        debug!("{mes:?}");
+                        let result = filter::filter(&mes, &tl);
+                        if let Err(reason) = result {
+                            info!("Message did not pass the filter. Reason: {reason}");
+                        } else {
+                            info!("Message passed the filter.");
+                            let _ = logger::log(mes).inspect_err(|e| error!("* {e}"));
+                        }
+                    }
                 }
-            }
+            })
         }))
         .await;
 }

@@ -2,7 +2,7 @@ use crate::config::CONFIG;
 use html2md::rewrite_html;
 use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
 use nanohtml2text::html2text;
-use ureq::json;
+use serde_json::json;
 
 pub fn log(message: Status) -> Result<(), Box<dyn std::error::Error>> {
     let logger = &CONFIG.logger;
@@ -59,7 +59,7 @@ pub fn log(message: Status) -> Result<(), Box<dyn std::error::Error>> {
                 // So let's use title field instead.
                 "title": message.uri,
                 // Set first image if exist, leave empty if not
-                "image": images.first().unwrap_or(&json!({})),
+                "image": images.first().unwrap_or(&serde_json::Value::Null),
             }));
 
             // Create an embed for each remaining images
@@ -69,13 +69,13 @@ pub fn log(message: Status) -> Result<(), Box<dyn std::error::Error>> {
                     "image": image,
                 }));
             }
-            ureq::json!({
+            json!({
                 "username": message.account.display_name,
                 "avatar_url": message.account.avatar,
                 "embeds": embeds,
             })
         } else {
-            ureq::json!({
+            json!({
                 "content": message.uri,
             })
         };

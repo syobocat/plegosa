@@ -11,20 +11,21 @@ license-file = "LICENSE"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-colored = "2.1.0"
+colored = "3.0.0"
 env_logger = "0.11.5"
-fast_html2md = "0.0.41"
+fast_html2md = "0.0.44"
 kanaria = "0.2.0"
 log = "0.4.22"
-megalodon = "0.14.1"
+megalodon = "1.0.0"
 nanohtml2text = "0.2.1"
 openssl = "0.10.68"
 regex = "1.11.1"
 serde = "1.0.216"
+serde_json = "1.0.138"
 tokio = "1.42.0"
 toml = "0.8.19"
 unicode-normalization = "0.1.24"
-ureq = { version = "2.12.1", features = ["json"] }
+ureq = { version = "3.0.5", features = ["json"] }
 
 [features]
 default = []
