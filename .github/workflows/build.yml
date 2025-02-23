@@ -50,4 +50,4 @@ jobs:
         with:
           command: build
           target: ${{ inputs.target }}
-          args: "--locked --release'"
+          args: "--locked --release"
