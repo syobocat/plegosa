@@ -4,9 +4,7 @@ url = 'pleroma.social' # Instance URL
 token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # Access token (Optional when timelines.home is false)
 
 [timelines]
-home = true    # Whether to watch Home Timeline (Default: true)
-local = false  # Whether to watch Local Timeline (a.k.a. Public Timeline in Pleroma) (Default: false)
-public = false # Whether to watch Public Timeline (a.k.a. Known Network in Pleroma, or Federated Timeline in Mastodon) (Default: false)
+target = ['Home'] # Timelines to watch (Possible values: Home, Local, and Public)
 
 [filter]
 case_sensitive = true # (Default: true)
@@ -21,5 +19,5 @@ enable = true # Whether to write hit log to Standard Output (Default: true)
 
 [logger.discord]
 enable = false # Whether to Write hit log to Discord (Default: false)
-use_embed = false # Send as Embed instead of link (Default: false)
+use_embed = false # Send as Embed instead of link (Default: true)
 webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # Webhook URL
