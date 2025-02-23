@@ -35,7 +35,7 @@ impl Logger for DiscordLogger {
                 .map(|image| json!({"url": image.url}));
             let mut embeds = Vec::new();
             embeds.push(json!({
-                "description": html2md::parse_html(&status.content).replace("[https://", "[").replace("\\#", "#").replace("\\_", "_"), // Workarounds for Discord's stupid Markdown parser
+                "description": html2md::rewrite_html(&status.content, false).replace("[https://", "[").replace("\\#", "#").replace("\\_", "_"), // Workarounds for Discord's stupid Markdown parser
                 "url": status.uri,
                 "timestamp": status.created_at.to_rfc3339(),
                 "title": status.uri,

@@ -12,7 +12,7 @@ license-file = "LICENSE"
 anyhow = "1.0.96"
 colored = "3.0.0"
 env_logger = "0.11.6"
-html2md = "0.2.15"
+fast_html2md = { version = "0.0.48", default-features = false, features = ["rewriter"] }
 kanaria = "0.2.0"
 log = "0.4.26"
 megalodon = "1.0.0"
