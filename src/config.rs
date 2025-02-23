@@ -39,13 +39,13 @@ pub struct InstanceConfig {
 #[derive(Deserialize)]
 #[serde(default)]
 pub struct TimelineConfig {
-    pub target: Vec<Timeline>,
+    pub targets: Vec<Timeline>,
 }
 
 impl Default for TimelineConfig {
     fn default() -> Self {
         Self {
-            target: vec![Timeline::Home],
+            targets: vec![Timeline::Home],
         }
     }
 }
@@ -146,7 +146,7 @@ impl Config {
     }
 
     pub async fn validate(&self) -> Result<()> {
-        if self.timelines.target.contains(&Timeline::Home) && self.instance.token.is_none() {
+        if self.timelines.targets.contains(&Timeline::Home) && self.instance.token.is_none() {
             println!(
             "{}",
             "* timelines.home is set, but instance.token is not provided. Generating new token..."

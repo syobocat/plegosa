@@ -4,7 +4,7 @@ url = 'pleroma.social' # Instance URL
 token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # Access token (Optional when timelines.home is false)
 
 [timelines]
-target = ['Home'] # Timelines to watch (Possible values: Home, Local, and Public)
+targets = [ 'Home' ] # Timelines to watch (Possible values: 'Home', 'Local', and 'Public')
 
 [filter]
 case_sensitive = true # (Default: true)
