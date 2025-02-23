@@ -46,8 +46,8 @@ jobs:
         run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
         if: contains(inputs.target, 'musl')
       - name: Build
-        uses: houseabsolute/actions-rust-cross@v0
+        uses: houseabsolute/actions-rust-cross@v1
         with:
           command: build
           target: ${{ inputs.target }}
-          args: "--locked --release --features 'static-openssl'"
+          args: "--locked --release'"
