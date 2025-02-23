@@ -17,6 +17,9 @@ pub async fn observe(
         Timeline::Public => client.public_streaming(),
     }
     .await;
+
+    log::info!("Successfully connected to the {timeline:?} timeline!");
+
     let dedup = timeline == Timeline::Home && need_dedup;
     stream
         .listen(Box::new(move |message| {
@@ -28,7 +31,8 @@ pub async fn observe(
                         return;
                     }
                     if let Err(e) = filters.filter(&status) {
-                        log::info!("{e}");
+                        let url = status.uri;
+                        log::debug!("{e}: {url}");
                     } else {
                         loggers.log(&status).await;
                     }

@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use config::{Config, Timeline};
+use env_logger::Env;
 use filter::Filters;
 use logger::Loggers;
 use tokio::task::JoinSet;
@@ -14,7 +15,7 @@ mod observer;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    env_logger::init();
+    env_logger::init_from_env(Env::default().default_filter_or("plegosa=info"));
 
     let config = Config::load().context("Failed to load config")?;
     config.validate().await.context("Invalid config")?;
@@ -27,7 +28,10 @@ async fn main() -> Result<()> {
     )?);
 
     if config.timeline.targets.contains(&Timeline::Home) {
-        client.verify_app_credentials().await?;
+        client
+            .verify_app_credentials()
+            .await
+            .context("Failed to verify token")?;
     }
 
     let filters = Arc::new(Filters::new(config.filter));

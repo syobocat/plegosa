@@ -11,7 +11,7 @@ use url::Url;
 
 use crate::auth;
 
-#[derive(Deserialize, PartialEq, Eq)]
+#[derive(Deserialize, PartialEq, Eq, Debug)]
 pub enum Timeline {
     Home,
     Local,
