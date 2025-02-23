@@ -19,55 +19,51 @@ jobs:
             os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             ext: ""
-            command: build
 
           - release_for: Linux-aarch64-musl
             os: ubuntu-latest
             target: aarch64-unknown-linux-musl
             ext: ""
-            command: build
 
           - release_for: Linux-x86_64-gnu
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             ext: ""
-            command: build
 
           - release_for: Linux-aarch64-gnu
             os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             ext: ""
-            command: build
             
           - release_for: FreeBSD-x86_64
             os: ubuntu-latest
             target: x86_64-unknown-freebsd
             ext: ""
-            command: build
 
           - release_for: NetBSD-x86_64
             os: ubuntu-latest
             target: x86_64-unknown-netbsd
             ext: ""
-            command: build
+
+          - release_for: illumos-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-illumos
+            ext: ""
 
           - release_for: Windows-x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
             ext: .exe
-            command: build
 
           - release_for: macOS-x86_64
             os: macOS-latest
             target: x86_64-apple-darwin
             ext: ""
-            command: build
 
           - release_for: macOS-aarch64
             os: macOS-latest
             target: aarch64-apple-darwin
             ext: ""
-            command: build
 
     runs-on: ${{ matrix.platform.os }}
     steps:
@@ -77,11 +73,11 @@ jobs:
         run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
         if: contains(matrix.platform.release_for, 'musl')
       - name: Build
-        uses: houseabsolute/actions-rust-cross@v0
+        uses: houseabsolute/actions-rust-cross@v1
         with:
-          command: ${{ matrix.platform.command }}
+          command: build
           target: ${{ matrix.platform.target }}
-          args: "--locked --release --features 'static-openssl'"
+          args: "--locked --release"
           strip: true
       - name: Publish release artifacts
         uses: actions/upload-artifact@v4

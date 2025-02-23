@@ -3,7 +3,6 @@ name = "plegosa"
 version = "0.4.0-alpha"
 authors = ["SyoBoN <syobon@syobon.net>"]
 edition = "2021"
-rust-version = "1.80"
 description = "A simple Egosa (ego-search) tool for Pleroma"
 repository = "https://github.com/syobocat/plegosa/"
 license-file = "LICENSE"
