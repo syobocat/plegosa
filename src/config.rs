@@ -22,7 +22,7 @@ pub enum Timeline {
 pub struct Config {
     pub instance: InstanceConfig,
     #[serde(default)]
-    pub timelines: TimelineConfig,
+    pub timeline: TimelineConfig,
     #[serde(default)]
     pub filter: FilterConfig,
     #[serde(default)]
@@ -146,7 +146,7 @@ impl Config {
     }
 
     pub async fn validate(&self) -> Result<()> {
-        if self.timelines.targets.contains(&Timeline::Home) && self.instance.token.is_none() {
+        if self.timeline.targets.contains(&Timeline::Home) && self.instance.token.is_none() {
             println!(
             "{}",
             "* timelines.home is set, but instance.token is not provided. Generating new token..."

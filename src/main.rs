@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
         None,
     )?);
 
-    if config.timelines.targets.contains(&Timeline::Home) {
+    if config.timeline.targets.contains(&Timeline::Home) {
         client.verify_app_credentials().await?;
     }
 
@@ -34,9 +34,9 @@ async fn main() -> Result<()> {
     let loggers = Arc::new(Loggers::new(config.logger));
 
     let mut handles = JoinSet::new();
-    let need_dedup = config.timelines.targets.contains(&Timeline::Local)
-        || config.timelines.targets.contains(&Timeline::Public);
-    for timeline in config.timelines.targets {
+    let need_dedup = config.timeline.targets.contains(&Timeline::Local)
+        || config.timeline.targets.contains(&Timeline::Public);
+    for timeline in config.timeline.targets {
         let client = Arc::clone(&client);
         let filters = Arc::clone(&filters);
         let loggers = Arc::clone(&loggers);

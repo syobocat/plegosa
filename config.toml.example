@@ -3,7 +3,7 @@ software = 'Pleroma' # Software name
 url = 'pleroma.social' # Instance URL
 token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # Access token (Optional when timelines.home is false)
 
-[timelines]
+[timeline]
 targets = [ 'Home' ] # Timelines to watch (Possible values: 'Home', 'Local', and 'Public')
 
 [filter]

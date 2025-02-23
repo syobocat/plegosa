@@ -15,7 +15,7 @@ software = 'Pleroma' # ソフトウェア名
 url = 'https://pleroma.social' # インスタンスのURL
 token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # アクセストークン(timelines.targetsに'Home'が含まれる場合のみ必須、わからなければ空にしておくと生成してくれます、設定は手動)
 
-[timelines]
+[timeline]
 targets = [ 'Home' ] # 監視するタイムライン ('Home'、'Local'、'Public'が指定可能)
 
 [filter]
