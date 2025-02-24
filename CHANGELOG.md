@@ -10,6 +10,7 @@
 ## Added
 
 - Added illumos support
+- You can now change the path to config.toml by specifying `PLEGOSA_CONFIG`
 
 # v0.3
 
