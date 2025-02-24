@@ -1,45 +1,54 @@
-use config::CONFIG;
-use streamer::Timeline;
-use utils::die_with_error;
+use std::sync::Arc;
 
+use anyhow::{Context, Result};
+use config::{Config, Timeline};
+use env_logger::Env;
+use filter::Filters;
+use logger::Loggers;
+use tokio::task::JoinSet;
+
+mod auth;
 mod config;
 mod filter;
 mod logger;
-mod streamer;
-mod utils;
+mod observer;
 
 #[tokio::main]
-async fn main() {
-    env_logger::init();
+async fn main() -> Result<()> {
+    env_logger::init_from_env(Env::default().default_filter_or("plegosa=info"));
 
-    config::validate().await;
+    let config = Config::load().context("Failed to load config")?;
+    config.validate().await.context("Invalid config")?;
 
-    let timelines = &CONFIG.timelines;
+    let client = Arc::new(megalodon::generator(
+        config.instance.software,
+        config.instance.url.to_string(),
+        config.instance.token,
+        None,
+    )?);
 
-    // Home Timeline
-    let home_tl_handle = if timelines.home {
-        println!("* Connecting to Home timeline...");
-        tokio::spawn(streamer::streaming(Timeline::Home))
-    } else {
-        tokio::spawn(async {})
-    };
+    if config.timeline.targets.contains(&Timeline::Home) {
+        client
+            .verify_app_credentials()
+            .await
+            .context("Failed to verify token")?;
+    }
 
-    // Local Timeline
-    let local_tl_handle = if timelines.local {
-        println!("* Connecting to Local timeline...");
-        tokio::spawn(streamer::streaming(Timeline::Local))
-    } else {
-        tokio::spawn(async {})
-    };
+    let filters = Arc::new(Filters::new(config.filter));
+    let loggers = Arc::new(Loggers::new(config.logger));
 
-    // Public Timeline
-    let public_tl_handle = if timelines.public {
-        println!("* Connecting to Public timeline...");
-        tokio::spawn(streamer::streaming(Timeline::Public))
-    } else {
-        tokio::spawn(async {})
-    };
+    let mut handles = JoinSet::new();
+    let need_dedup = config.timeline.targets.contains(&Timeline::Local)
+        || config.timeline.targets.contains(&Timeline::Public);
+    for timeline in config.timeline.targets {
+        let client = Arc::clone(&client);
+        let filters = Arc::clone(&filters);
+        let loggers = Arc::clone(&loggers);
+        handles.spawn(observer::observe(
+            client, filters, loggers, timeline, need_dedup,
+        ));
+    }
+    handles.join_all().await;
 
-    tokio::try_join!(home_tl_handle, local_tl_handle, public_tl_handle)
-        .unwrap_or_else(|e| die_with_error("Failed to spawn processes", e));
+    Ok(())
 }

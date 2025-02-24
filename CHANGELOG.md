@@ -1,3 +1,23 @@
+# v0.4
+
+## Changed
+
+- `url` in `config.toml` must be include schema (`example.tld` → `https://example.tld`)
+- Removed `timelines.home`, `timelines.local`, `timelines.public`. Please migrate to `timeline.targets`
+- `openssl` should no longer be needed
+- Plegosa no longer relies on `LazyLock`, allowing you to compile with the lower version of Rust
+
+## Added
+
+- Added illumos support
+- You can now change the path to config.toml by specifying `PLEGOSA_CONFIG`
+
+# v0.3
+
+## Fixed
+
+- Plegosa no longer skips Quotes
+
 # v0.2.3
 
 ## Added

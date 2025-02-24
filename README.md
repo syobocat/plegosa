@@ -4,17 +4,6 @@ Pleromaに移住した結果Misskeyのアンテナが恋しくなってしまっ
 
 Plegosaという名前ですがおそらくMastodonでも動きます。FriendicaでもFirefishでも動きます。たぶん。
 
-# 依存関係を教えて
-
-- ビルド時依存
-  - rust >= 1.76
-  - gmake (`static-openssl`が有効の場合)
-  - perl (`static-openssl`が有効の場合)
-- 実行時依存
-  - openssl (`static-openssl`が無効の場合)
-
-たぶんこれで全部。
-
 # どう使うの
 
 `config.toml`ファイルを作って以下の情報を書きこめばOKです。  
@@ -23,13 +12,11 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 ```toml
 [instance]
 software = 'Pleroma' # ソフトウェア名
-url = 'pleroma.social' # インスタンスのURL
-token = 'xxxxxxxxxxxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxx' # アクセストークン(timelines.homeがtrueの時のみ必須、わからなければ空にしておくと生成してくれます、設定は手動)
+url = 'https://pleroma.social' # インスタンスのURL
+token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # アクセストークン(timelines.targetsに'Home'が含まれる場合のみ必須、わからなければ空にしておくと生成してくれます、設定は手動)
 
-[timelines]
-home = true    # ホームタイムラインを監視するかどうか (デフォルト: true)
-local = false  # ローカルタイムラインを監視するかどうか (デフォルト: false)
-public = false # グローバルタイムラインを監視するかどうか (デフォルト: false)
+[timeline]
+targets = [ 'Home' ] # 監視するタイムライン ('Home'、'Local'、'Public'が指定可能)
 
 [filter]
 case_sensitive = true # include, excludeで大文字/小文字、ひらがな/カタカナ及び互換等価な字を区別するかどうか(falseでも正準等価な字は区別しません) (デフォルト: true)
@@ -44,16 +31,6 @@ enable = true # ヒットログを標準出力に書き込むかどうか (デ�
 
 [logger.discord]
 enable = false # ヒットログをDiscordに送信するかどうか (デフォルト: false)
-use_embed = false # リンクを直貼りするのではなくEmbedとして送信する(公開範囲によってはfalseでもEmbedとして送信されます) (デフォルト: false)
+use_embed = true # リンクを直貼りするのではなくEmbedとして送信する(公開範囲によってはfalseでもEmbedとして送信されます) (デフォルト: true)
 webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # WebhookのURL
 ```
-
-# Known issues
-  
-- ソースコードが汚い  
-  ちょっとずつマシになっているようないないような…
-
-- 設定ファイルの破壊的変更大杉  
-  もうちょっとしたら安定します
-
-Contributeお待ちしております。
