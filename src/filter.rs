@@ -13,13 +13,16 @@ mod normal;
 mod reblog;
 mod regex;
 
+#[cfg(test)]
+mod test;
+
 fn normalize(content: &str, case_sensitive: bool) -> String {
     if case_sensitive {
         content.nfc().collect()
     } else {
         UCSStr::from_str(content)
             .lower_case()
-            .hiragana()
+            .katakana()
             .to_string()
             .nfkc()
             .collect()

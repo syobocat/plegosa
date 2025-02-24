@@ -1,12 +1,10 @@
 use std::{env, fs, process};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use colored::Colorize;
-use kanaria::string::UCSStr;
 use megalodon::SNS;
 use regex::Regex;
 use serde::Deserialize;
-use unicode_normalization::UnicodeNormalization;
 use url::Url;
 
 use crate::auth;
@@ -115,34 +113,8 @@ impl Config {
     pub fn load() -> Result<Self> {
         let file_path = env::var("PLEGOSA_CONFIG").unwrap_or_else(|_| "config.toml".to_owned());
         let toml = fs::read_to_string(file_path)?;
-        let mut config: Self = toml::from_str(&toml)?;
 
-        for inc in &mut config.filter.include {
-            *inc = if config.filter.case_sensitive {
-                inc.nfc().collect()
-            } else {
-                UCSStr::from_str(inc)
-                    .lower_case()
-                    .hiragana()
-                    .to_string()
-                    .nfkc()
-                    .collect()
-            };
-        }
-        for exc in &mut config.filter.exclude {
-            *exc = if config.filter.case_sensitive {
-                exc.nfc().collect()
-            } else {
-                UCSStr::from_str(exc)
-                    .lower_case()
-                    .hiragana()
-                    .to_string()
-                    .nfkc()
-                    .collect()
-            };
-        }
-
-        Ok(config)
+        toml::from_str(&toml).context("Failed to parse config file")
     }
 
     pub async fn validate(&self) -> Result<()> {

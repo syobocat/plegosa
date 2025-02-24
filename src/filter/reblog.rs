@@ -18,3 +18,36 @@ impl Filter for ReblogFilter {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use megalodon::entities::Status;
+
+    use crate::filter::test::*;
+
+    use super::*;
+
+    #[test]
+    fn reblog_test() {
+        let not_reblog = Status {
+            reblog: None,
+            quote: false,
+            ..plain_status()
+        };
+        let reblog = Status {
+            reblog: Some(Box::new(plain_status())),
+            quote: false,
+            ..plain_status()
+        };
+        let quote = Status {
+            reblog: Some(Box::new(plain_status())),
+            quote: true,
+            ..plain_status()
+        };
+
+        let reblog_filter = ReblogFilter::new();
+        assert!(reblog_filter.filter(&not_reblog).is_ok());
+        assert!(reblog_filter.filter(&reblog).is_err());
+        assert!(reblog_filter.filter(&quote).is_ok());
+    }
+}

@@ -53,3 +53,38 @@ impl Filter for RegexFilter {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use megalodon::entities::Status;
+
+    use crate::filter::test::*;
+
+    use super::*;
+
+    #[test]
+    fn regex_test() {
+        let should_match = Status {
+            content: "This should match".to_owned(),
+            ..plain_status()
+        };
+        let should_not_match = Status {
+            content: "This should not match".to_owned(),
+            ..plain_status()
+        };
+        let some_random_status = Status {
+            content: "Some random status".to_owned(),
+            ..plain_status()
+        };
+
+        let regex_filter_a = RegexFilter::new(vec!["this.*d match".to_owned()], Vec::new(), false);
+        assert!(regex_filter_a.filter(&should_match).is_ok());
+        assert!(regex_filter_a.filter(&should_not_match).is_err());
+        assert!(regex_filter_a.filter(&some_random_status).is_err());
+
+        let regex_filter_b = RegexFilter::new(Vec::new(), vec!["this.*not".to_owned()], false);
+        assert!(regex_filter_b.filter(&should_match).is_ok());
+        assert!(regex_filter_b.filter(&should_not_match).is_err());
+        assert!(regex_filter_b.filter(&some_random_status).is_ok());
+    }
+}

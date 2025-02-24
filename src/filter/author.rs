@@ -39,3 +39,47 @@ impl Filter for AuthorFilter {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use megalodon::entities::{Account, Status};
+
+    use crate::filter::test::*;
+
+    use super::*;
+
+    #[test]
+    fn author() {
+        let should_match = Status {
+            account: Account {
+                acct: "should_match".to_owned(),
+                ..plain_account()
+            },
+            ..plain_status()
+        };
+        let should_not_match = Status {
+            account: Account {
+                acct: "should_not_match".to_owned(),
+                ..plain_account()
+            },
+            ..plain_status()
+        };
+        let some_random_man = Status {
+            account: Account {
+                acct: "some_random_man".to_owned(),
+                ..plain_account()
+            },
+            ..plain_status()
+        };
+
+        let author_filter_a = AuthorFilter::new(vec!["should_match".to_owned()], Vec::new());
+        assert!(author_filter_a.filter(&should_match).is_ok());
+        assert!(author_filter_a.filter(&should_not_match).is_err());
+        assert!(author_filter_a.filter(&some_random_man).is_err());
+
+        let author_filter_b = AuthorFilter::new(Vec::new(), vec!["should_not_match".to_owned()]);
+        assert!(author_filter_b.filter(&should_match).is_ok());
+        assert!(author_filter_b.filter(&should_not_match).is_err());
+        assert!(author_filter_b.filter(&some_random_man).is_ok());
+    }
+}
