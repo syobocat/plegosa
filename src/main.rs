@@ -44,9 +44,8 @@ async fn main() -> Result<()> {
         let client = Arc::clone(&client);
         let filters = Arc::clone(&filters);
         let loggers = Arc::clone(&loggers);
-        handles.spawn(observer::observe(
-            client, filters, loggers, timeline, need_dedup,
-        ));
+        let dedup = timeline == Timeline::Home && need_dedup;
+        handles.spawn(observer::observe(client, filters, loggers, timeline, dedup));
     }
     handles.join_all().await;
 

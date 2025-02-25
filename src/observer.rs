@@ -9,7 +9,7 @@ pub async fn observe(
     filters: Arc<Filters>,
     loggers: Arc<Loggers>,
     timeline: Timeline,
-    need_dedup: bool,
+    dedup: bool,
 ) {
     let stream = match timeline {
         Timeline::Home => client.user_streaming(),
@@ -20,7 +20,6 @@ pub async fn observe(
 
     log::info!("Successfully connected to the {timeline:?} timeline!");
 
-    let dedup = timeline == Timeline::Home && need_dedup;
     stream
         .listen(Box::new(move |message| {
             let filters = Arc::clone(&filters);
@@ -28,6 +27,8 @@ pub async fn observe(
             Box::pin(async move {
                 if let Message::Update(status) = message {
                     if dedup && status.visibility == StatusVisibility::Public {
+                        let url = status.uri;
+                        log::debug!("Deduplicated: {url}");
                         return;
                     }
                     if let Err(e) = filters.filter(&status) {
