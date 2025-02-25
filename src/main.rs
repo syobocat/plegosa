@@ -13,6 +13,8 @@ mod filter;
 mod logger;
 mod observer;
 
+const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
+
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("plegosa=info"));
@@ -24,7 +26,7 @@ async fn main() -> Result<()> {
         config.instance.software,
         config.instance.url.to_string(),
         config.instance.token,
-        None,
+        Some(USER_AGENT.to_owned()),
     )?);
 
     if config.timeline.targets.contains(&Timeline::Home) {

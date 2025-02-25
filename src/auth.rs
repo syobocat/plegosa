@@ -5,8 +5,10 @@ use colored::Colorize;
 use megalodon::{default::NO_REDIRECT, megalodon::AppInputOptions, SNS};
 use url::Url;
 
+use crate::USER_AGENT;
+
 pub async fn oauth(sns: SNS, url: Url) -> Result<()> {
-    let client = megalodon::generator(sns, url.to_string(), None, None)?;
+    let client = megalodon::generator(sns, url.to_string(), None, Some(USER_AGENT.to_owned()))?;
     let options = AppInputOptions {
         scopes: Some(vec!["read".to_owned()]),
         ..Default::default()
