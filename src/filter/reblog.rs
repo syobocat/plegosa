@@ -23,7 +23,7 @@ impl Filter for ReblogFilter {
 mod test {
     use megalodon::entities::Status;
 
-    use crate::filter::test::*;
+    use crate::filter::tests::*;
 
     use super::*;
 

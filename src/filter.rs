@@ -14,7 +14,7 @@ mod reblog;
 mod regex;
 
 #[cfg(test)]
-mod test;
+mod tests;
 
 fn normalize(content: &str, case_sensitive: bool) -> String {
     if case_sensitive {

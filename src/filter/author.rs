@@ -44,7 +44,7 @@ impl Filter for AuthorFilter {
 mod test {
     use megalodon::entities::{Account, Status};
 
-    use crate::filter::test::*;
+    use crate::filter::tests::*;
 
     use super::*;
 

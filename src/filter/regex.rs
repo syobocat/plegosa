@@ -58,7 +58,7 @@ impl Filter for RegexFilter {
 mod test {
     use megalodon::entities::Status;
 
-    use crate::filter::test::*;
+    use crate::filter::tests::*;
 
     use super::*;
 

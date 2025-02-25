@@ -55,7 +55,7 @@ impl Filter for NormalFilter {
 mod test {
     use megalodon::entities::Status;
 
-    use crate::filter::test::*;
+    use crate::filter::tests::*;
 
     use super::*;
 
