@@ -29,8 +29,25 @@ fn normalize(content: &str, case_sensitive: bool) -> String {
     }
 }
 
+#[derive(PartialEq, Eq)]
+pub enum FilterResult {
+    Pass,
+    Block(String),
+}
+
+#[cfg(test)]
+impl FilterResult {
+    fn passed(&self) -> bool {
+        self == &FilterResult::Pass
+    }
+
+    fn blocked(&self) -> bool {
+        !self.passed()
+    }
+}
+
 trait Filter {
-    fn filter(&self, status: &Status) -> Result<(), String>;
+    fn filter(&self, status: &Status) -> FilterResult;
 }
 
 pub struct Filters {
@@ -75,17 +92,25 @@ impl Filters {
         }
     }
 
-    pub fn filter(&self, status: &Status) -> Result<(), String> {
-        self.reblog.filter(status)?;
+    pub fn filter(&self, status: &Status) -> FilterResult {
+        if let FilterResult::Block(reason) = self.reblog.filter(status) {
+            return FilterResult::Block(reason);
+        }
         if let Some(author) = &self.author {
-            author.filter(status)?;
+            if let FilterResult::Block(reason) = author.filter(status) {
+                return FilterResult::Block(reason);
+            }
         }
         if let Some(normal) = &self.normal {
-            normal.filter(status)?;
+            if let FilterResult::Block(reason) = normal.filter(status) {
+                return FilterResult::Block(reason);
+            }
         }
         if let Some(regex) = &self.regex {
-            regex.filter(status)?;
+            if let FilterResult::Block(reason) = regex.filter(status) {
+                return FilterResult::Block(reason);
+            }
         }
-        Ok(())
+        FilterResult::Pass
     }
 }

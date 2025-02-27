@@ -1,6 +1,6 @@
 use megalodon::entities::Status;
 
-use super::{normalize, Filter};
+use super::{normalize, Filter, FilterResult};
 
 pub struct NormalFilter {
     include: Vec<String>,
@@ -27,15 +27,15 @@ impl NormalFilter {
 }
 
 impl Filter for NormalFilter {
-    fn filter(&self, status: &Status) -> Result<(), String> {
+    fn filter(&self, status: &Status) -> FilterResult {
         let content = normalize(&status.content, self.case_sensitive);
         if !self.include.is_empty() && !self.include.iter().any(|x| content.contains(x)) {
-            return Err("The status does not contain include".to_owned());
+            return FilterResult::Block("The status does not contain include".to_owned());
         }
         if self.exclude.iter().any(|x| content.contains(x)) {
-            return Err("The status contains exclude".to_owned());
+            return FilterResult::Block("The status contains exclude".to_owned());
         }
-        Ok(())
+        FilterResult::Pass
     }
 }
 
@@ -76,23 +76,23 @@ mod test {
         };
 
         let normal_filter_a = NormalFilter::new(vec!["should match".to_owned()], Vec::new(), true);
-        assert!(normal_filter_a.filter(&should_match).is_ok());
-        assert!(normal_filter_a.filter(&should_not_match).is_err());
-        assert!(normal_filter_a.filter(&some_random_status).is_err());
+        assert!(normal_filter_a.filter(&should_match).passed());
+        assert!(normal_filter_a.filter(&should_not_match).blocked());
+        assert!(normal_filter_a.filter(&some_random_status).blocked());
 
-        assert!(normal_filter_a.filter(&should_match_upper).is_err());
-        assert!(normal_filter_a.filter(&should_not_match_upper).is_err());
-        assert!(normal_filter_a.filter(&some_random_status_upper).is_err());
+        assert!(normal_filter_a.filter(&should_match_upper).blocked());
+        assert!(normal_filter_a.filter(&should_not_match_upper).blocked());
+        assert!(normal_filter_a.filter(&some_random_status_upper).blocked());
 
         let normal_filter_b =
             NormalFilter::new(Vec::new(), vec!["should not match".to_owned()], true);
-        assert!(normal_filter_b.filter(&should_match).is_ok());
-        assert!(normal_filter_b.filter(&should_not_match).is_err());
-        assert!(normal_filter_b.filter(&some_random_status).is_ok());
+        assert!(normal_filter_b.filter(&should_match).passed());
+        assert!(normal_filter_b.filter(&should_not_match).blocked());
+        assert!(normal_filter_b.filter(&some_random_status).passed());
 
-        assert!(normal_filter_b.filter(&should_match_upper).is_ok());
-        assert!(normal_filter_b.filter(&should_not_match_upper).is_ok());
-        assert!(normal_filter_b.filter(&some_random_status_upper).is_ok());
+        assert!(normal_filter_b.filter(&should_match_upper).passed());
+        assert!(normal_filter_b.filter(&should_not_match_upper).passed());
+        assert!(normal_filter_b.filter(&some_random_status_upper).passed());
     }
 
     #[test]
@@ -111,15 +111,15 @@ mod test {
         };
 
         let normal_filter_a = NormalFilter::new(vec!["should match".to_owned()], Vec::new(), false);
-        assert!(normal_filter_a.filter(&should_match_upper).is_ok());
-        assert!(normal_filter_a.filter(&should_not_match_upper).is_err());
-        assert!(normal_filter_a.filter(&some_random_status_upper).is_err());
+        assert!(normal_filter_a.filter(&should_match_upper).passed());
+        assert!(normal_filter_a.filter(&should_not_match_upper).blocked());
+        assert!(normal_filter_a.filter(&some_random_status_upper).blocked());
 
         let normal_filter_b =
             NormalFilter::new(Vec::new(), vec!["should not match".to_owned()], false);
-        assert!(normal_filter_b.filter(&should_match_upper).is_ok());
-        assert!(normal_filter_b.filter(&should_not_match_upper).is_err());
-        assert!(normal_filter_b.filter(&some_random_status_upper).is_ok());
+        assert!(normal_filter_b.filter(&should_match_upper).passed());
+        assert!(normal_filter_b.filter(&should_not_match_upper).blocked());
+        assert!(normal_filter_b.filter(&some_random_status_upper).passed());
     }
 
     #[test]
@@ -142,14 +142,14 @@ mod test {
         };
 
         let normal_filter_a = NormalFilter::new(vec!["ガギグゲゴ".to_owned()], Vec::new(), true);
-        assert!(normal_filter_a.filter(&composition).is_ok());
-        assert!(normal_filter_a.filter(&decomposition).is_ok());
-        assert!(normal_filter_a.filter(&compatibility).is_err());
+        assert!(normal_filter_a.filter(&composition).passed());
+        assert!(normal_filter_a.filter(&decomposition).passed());
+        assert!(normal_filter_a.filter(&compatibility).blocked());
 
         let normal_filter_b = NormalFilter::new(vec!["がぎぐげご".to_owned()], Vec::new(), true);
-        assert!(normal_filter_b.filter(&composition).is_err());
-        assert!(normal_filter_b.filter(&decomposition).is_err());
-        assert!(normal_filter_b.filter(&compatibility).is_err());
+        assert!(normal_filter_b.filter(&composition).blocked());
+        assert!(normal_filter_b.filter(&decomposition).blocked());
+        assert!(normal_filter_b.filter(&compatibility).blocked());
     }
 
     #[test]
@@ -172,13 +172,13 @@ mod test {
         };
 
         let normal_filter = NormalFilter::new(vec!["ガギグゲゴ".to_owned()], Vec::new(), false);
-        assert!(normal_filter.filter(&composition).is_ok());
-        assert!(normal_filter.filter(&decomposition).is_ok());
-        assert!(normal_filter.filter(&compatibility).is_ok());
+        assert!(normal_filter.filter(&composition).passed());
+        assert!(normal_filter.filter(&decomposition).passed());
+        assert!(normal_filter.filter(&compatibility).passed());
 
         let normal_filter_b = NormalFilter::new(vec!["がぎぐげご".to_owned()], Vec::new(), false);
-        assert!(normal_filter_b.filter(&composition).is_ok());
-        assert!(normal_filter_b.filter(&decomposition).is_ok());
-        assert!(normal_filter_b.filter(&compatibility).is_ok());
+        assert!(normal_filter_b.filter(&composition).passed());
+        assert!(normal_filter_b.filter(&decomposition).passed());
+        assert!(normal_filter_b.filter(&compatibility).passed());
     }
 }

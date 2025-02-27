@@ -1,6 +1,6 @@
 use megalodon::entities::Status;
 
-use super::Filter;
+use super::{Filter, FilterResult};
 
 pub struct AuthorFilter {
     include: Vec<String>,
@@ -14,15 +14,15 @@ impl AuthorFilter {
 }
 
 impl Filter for AuthorFilter {
-    fn filter(&self, status: &Status) -> Result<(), String> {
+    fn filter(&self, status: &Status) -> FilterResult {
         if !self.include.is_empty() && !self.include.contains(&status.account.acct) {
-            return Err("The author is not in user_include".to_owned());
+            return FilterResult::Block("The author is not in user_include".to_owned());
         }
 
         if self.exclude.contains(&status.account.acct) {
-            return Err("The author is in user_exclude".to_owned());
+            return FilterResult::Block("The author is in user_exclude".to_owned());
         }
-        Ok(())
+        FilterResult::Pass
     }
 }
 
@@ -59,13 +59,13 @@ mod test {
         };
 
         let author_filter_a = AuthorFilter::new(vec!["should_match".to_owned()], Vec::new());
-        assert!(author_filter_a.filter(&should_match).is_ok());
-        assert!(author_filter_a.filter(&should_not_match).is_err());
-        assert!(author_filter_a.filter(&some_random_man).is_err());
+        assert!(author_filter_a.filter(&should_match).passed());
+        assert!(author_filter_a.filter(&should_not_match).blocked());
+        assert!(author_filter_a.filter(&some_random_man).blocked());
 
         let author_filter_b = AuthorFilter::new(Vec::new(), vec!["should_not_match".to_owned()]);
-        assert!(author_filter_b.filter(&should_match).is_ok());
-        assert!(author_filter_b.filter(&should_not_match).is_err());
-        assert!(author_filter_b.filter(&some_random_man).is_ok());
+        assert!(author_filter_b.filter(&should_match).passed());
+        assert!(author_filter_b.filter(&should_not_match).blocked());
+        assert!(author_filter_b.filter(&some_random_man).passed());
     }
 }

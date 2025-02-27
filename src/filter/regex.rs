@@ -1,7 +1,7 @@
 use megalodon::entities::Status;
 use regex::Regex;
 
-use super::{normalize, Filter};
+use super::{normalize, Filter, FilterResult};
 
 pub struct RegexFilter {
     include: Vec<Regex>,
@@ -20,15 +20,15 @@ impl RegexFilter {
 }
 
 impl Filter for RegexFilter {
-    fn filter(&self, status: &Status) -> Result<(), String> {
+    fn filter(&self, status: &Status) -> FilterResult {
         let content = normalize(&status.content, self.case_sensitive);
         if !self.include.is_empty() && !self.include.iter().any(|regex| regex.is_match(&content)) {
-            return Err("The status does not contain include".to_owned());
+            return FilterResult::Block("The status does not contain include".to_owned());
         }
         if self.exclude.iter().any(|regex| regex.is_match(&content)) {
-            return Err("The status contains exclude".to_owned());
+            return FilterResult::Block("The status contains exclude".to_owned());
         }
-        Ok(())
+        FilterResult::Pass
     }
 }
 
@@ -56,13 +56,13 @@ mod test {
         };
 
         let regex_filter_a = RegexFilter::new(vec!["this.*d match".to_owned()], Vec::new(), false);
-        assert!(regex_filter_a.filter(&should_match).is_ok());
-        assert!(regex_filter_a.filter(&should_not_match).is_err());
-        assert!(regex_filter_a.filter(&some_random_status).is_err());
+        assert!(regex_filter_a.filter(&should_match).passed());
+        assert!(regex_filter_a.filter(&should_not_match).blocked());
+        assert!(regex_filter_a.filter(&some_random_status).blocked());
 
         let regex_filter_b = RegexFilter::new(Vec::new(), vec!["this.*not".to_owned()], false);
-        assert!(regex_filter_b.filter(&should_match).is_ok());
-        assert!(regex_filter_b.filter(&should_not_match).is_err());
-        assert!(regex_filter_b.filter(&some_random_status).is_ok());
+        assert!(regex_filter_b.filter(&should_match).passed());
+        assert!(regex_filter_b.filter(&should_not_match).blocked());
+        assert!(regex_filter_b.filter(&some_random_status).passed());
     }
 }
