@@ -2,7 +2,11 @@ use std::sync::Arc;
 
 use megalodon::{entities::StatusVisibility, streaming::Message, Megalodon};
 
-use crate::{config::Timeline, filter::Filters, logger::Loggers};
+use crate::{
+    config::Timeline,
+    filter::{FilterResult, Filters},
+    logger::Loggers,
+};
 
 pub async fn observe(
     client: Arc<Box<dyn Megalodon + Send + Sync>>,
@@ -31,9 +35,9 @@ pub async fn observe(
                         log::debug!("Deduplicated: {url}");
                         return;
                     }
-                    if let Err(e) = filters.filter(&status) {
+                    if let FilterResult::Block(reason) = filters.filter(&status) {
                         let url = status.uri;
-                        log::debug!("{e}: {url}");
+                        log::debug!("{reason}: {url}");
                     } else {
                         loggers.log(&status).await;
                     }

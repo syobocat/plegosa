@@ -1,76 +1,75 @@
 # v0.4
 
-## Changed
+## 変更
 
-- `url` in `config.toml` must be include schema (`example.tld` → `https://example.tld`)
-- Removed `timelines.home`, `timelines.local`, `timelines.public`. Please migrate to `timeline.targets`
-- `openssl` should no longer be needed
-- Plegosa no longer relies on `LazyLock`, allowing you to compile with the lower version of Rust
+- `config.toml`の`url`にスキーマが必須に (例: `example.tld` → `https://example.tld`)
+- `timelines.home`、`timelines.local`、`timelines.public`を削除し、`timeline.targets`に
+- `openssl`が(たぶん)不要に
 
-## Added
+## 追加
 
-- Added illumos support
-- You can now change the path to config.toml by specifying `PLEGOSA_CONFIG`
+- illumos向けビルドを追加
+- `PLEGOSA_CONFIG`環境変数で設定ファイルのパスを変更できるように
 
 # v0.3
 
-## Fixed
+## 修正
 
-- Plegosa no longer skips Quotes
+- 引用を無視しないように
 
 # v0.2.3
 
-## Added
+## 追加
 
-- Added unicode normalization support
+- Unicode正規化に対応
 
-## Removed
+## 削除
 
-- Removed Solaris 10 support (Solaris 11 support is currently unavailable)
+- Solaris 10向けビルドを廃止 (Solaris 11向けビルドは現在利用できません)
 
 # v0.2.2
 
-## Fixed
+## 修正
 
-- `include` is now working properly
+- `include`が正常に動作するように
 
 # v0.2.1
 
-## Fixed
+## 修正
 
-- `exclude` is now working properly
+- `exclude`が正常に動作するように
 
 # v0.2.0
 
-## Changed
+## 変更
 
-- .env is obsolete; Please migrate to config.toml
-- `Discord` logger will now use embeds
+- .envからconfig.tomlに移行
+- Discord loggerがデフォルトでEmbedを使用するように
 
-## Added
+## 追加
 
-- Multiple logger support
-- Added an option to always use Discord embed
-- Added Linux AArch64 support
+- 複数のloggerに対応
+- Discord loggerに常にEmbedを使用するオプションを追加
+- AArch64環境のLinux向けビルドを追加
 
-## Fixed
+## 修正
 
-- Reposts will no longer appear in the log
+- リピートが記録されないように
 
 # v0.1.2
 
-## Added
+## 追加
 
-- Added Solaris support
-- Added feature flag to enable static link for OpenSSL
+- Solaris向けビルドを追加
+- OpenSSLを静的にリンクするFeature Flagを追加
 
 # v0.1.1
 
-## Added
+## 追加
 
-- Added NetBSD support
-- Dynamically link OpenSSL except for linux-musl and netbsd
+- NetBSD向けビルドを追加
+- linux-muslとNetBSDを除きOpenSSLを動的にリンクするように
 
 # v0.1.0
 
-Initial release.
+リリース

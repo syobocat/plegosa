@@ -1,6 +1,6 @@
 use megalodon::entities::Status;
 
-use super::Filter;
+use super::{Filter, FilterResult};
 
 pub struct ReblogFilter {}
 
@@ -11,11 +11,11 @@ impl ReblogFilter {
 }
 
 impl Filter for ReblogFilter {
-    fn filter(&self, status: &Status) -> Result<(), String> {
+    fn filter(&self, status: &Status) -> FilterResult {
         if status.reblog.is_some() && !status.quote {
-            return Err("The status is a repeat".to_owned());
+            return FilterResult::Block("The status is a repeat".to_owned());
         }
-        Ok(())
+        FilterResult::Pass
     }
 }
 
@@ -46,8 +46,8 @@ mod test {
         };
 
         let reblog_filter = ReblogFilter::new();
-        assert!(reblog_filter.filter(&not_reblog).is_ok());
-        assert!(reblog_filter.filter(&reblog).is_err());
-        assert!(reblog_filter.filter(&quote).is_ok());
+        assert!(reblog_filter.filter(&not_reblog).passed());
+        assert!(reblog_filter.filter(&reblog).blocked());
+        assert!(reblog_filter.filter(&quote).passed());
     }
 }
