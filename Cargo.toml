@@ -28,10 +28,10 @@ url = { version = "2.5.4", features = ["serde"] }
 # Workaround for #11
 [package.metadata.cross.target.x86_64-unknown-netbsd]
 pre-build = [
-    "mkdir -p /tmp/netbsd",
+    "dir=$(mktemp -d)",
     "curl https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.4/amd64/binary/sets/base.tar.xz -O",
-    "tar -C /tmp/netbsd -xJf base.tar.xz",
-    "cp /tmp/netbsd/usr/lib/libexecinfo.so /usr/local/x86_64-unknown-netbsd/lib",
+    "tar -C ${dir} -xJf base.tar.xz",
+    "cp ${dir}/usr/lib/libexecinfo.so /usr/local/x86_64-unknown-netbsd/lib",
     "rm base.tar.xz",
-    "rm -rf /tmp/netbsd",
+    "rm -rf ${dir}",
 ]
