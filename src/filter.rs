@@ -69,16 +69,16 @@ impl Filters {
             (
                 None,
                 Some(RegexFilter::new(
-                    config.include,
-                    config.exclude,
+                    &config.include,
+                    &config.exclude,
                     config.case_sensitive,
                 )),
             )
         } else {
             (
                 Some(NormalFilter::new(
-                    config.include,
-                    config.exclude,
+                    &config.include,
+                    &config.exclude,
                     config.case_sensitive,
                 )),
                 None,

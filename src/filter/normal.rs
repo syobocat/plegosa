@@ -9,7 +9,7 @@ pub struct NormalFilter {
 }
 
 impl NormalFilter {
-    pub fn new(include: Vec<String>, exclude: Vec<String>, case_sensitive: bool) -> Self {
+    pub fn new(include: &[String], exclude: &[String], case_sensitive: bool) -> Self {
         let include: Vec<String> = include
             .iter()
             .map(|inc| normalize(inc, case_sensitive))
@@ -75,7 +75,7 @@ mod test {
             ..plain_status()
         };
 
-        let normal_filter_a = NormalFilter::new(vec!["should match".to_owned()], Vec::new(), true);
+        let normal_filter_a = NormalFilter::new(&["should match".to_owned()], &[], true);
         assert!(normal_filter_a.filter(&should_match).passed());
         assert!(normal_filter_a.filter(&should_not_match).blocked());
         assert!(normal_filter_a.filter(&some_random_status).blocked());
@@ -84,8 +84,7 @@ mod test {
         assert!(normal_filter_a.filter(&should_not_match_upper).blocked());
         assert!(normal_filter_a.filter(&some_random_status_upper).blocked());
 
-        let normal_filter_b =
-            NormalFilter::new(Vec::new(), vec!["should not match".to_owned()], true);
+        let normal_filter_b = NormalFilter::new(&[], &["should not match".to_owned()], true);
         assert!(normal_filter_b.filter(&should_match).passed());
         assert!(normal_filter_b.filter(&should_not_match).blocked());
         assert!(normal_filter_b.filter(&some_random_status).passed());
@@ -110,13 +109,12 @@ mod test {
             ..plain_status()
         };
 
-        let normal_filter_a = NormalFilter::new(vec!["should match".to_owned()], Vec::new(), false);
+        let normal_filter_a = NormalFilter::new(&["should match".to_owned()], &[], false);
         assert!(normal_filter_a.filter(&should_match_upper).passed());
         assert!(normal_filter_a.filter(&should_not_match_upper).blocked());
         assert!(normal_filter_a.filter(&some_random_status_upper).blocked());
 
-        let normal_filter_b =
-            NormalFilter::new(Vec::new(), vec!["should not match".to_owned()], false);
+        let normal_filter_b = NormalFilter::new(&[], &["should not match".to_owned()], false);
         assert!(normal_filter_b.filter(&should_match_upper).passed());
         assert!(normal_filter_b.filter(&should_not_match_upper).blocked());
         assert!(normal_filter_b.filter(&some_random_status_upper).passed());
@@ -141,12 +139,12 @@ mod test {
             ..plain_status()
         };
 
-        let normal_filter_a = NormalFilter::new(vec!["ガギグゲゴ".to_owned()], Vec::new(), true);
+        let normal_filter_a = NormalFilter::new(&["ガギグゲゴ".to_owned()], &[], true);
         assert!(normal_filter_a.filter(&composition).passed());
         assert!(normal_filter_a.filter(&decomposition).passed());
         assert!(normal_filter_a.filter(&compatibility).blocked());
 
-        let normal_filter_b = NormalFilter::new(vec!["がぎぐげご".to_owned()], Vec::new(), true);
+        let normal_filter_b = NormalFilter::new(&["がぎぐげご".to_owned()], &[], true);
         assert!(normal_filter_b.filter(&composition).blocked());
         assert!(normal_filter_b.filter(&decomposition).blocked());
         assert!(normal_filter_b.filter(&compatibility).blocked());
@@ -171,12 +169,12 @@ mod test {
             ..plain_status()
         };
 
-        let normal_filter = NormalFilter::new(vec!["ガギグゲゴ".to_owned()], Vec::new(), false);
+        let normal_filter = NormalFilter::new(&["ガギグゲゴ".to_owned()], &[], false);
         assert!(normal_filter.filter(&composition).passed());
         assert!(normal_filter.filter(&decomposition).passed());
         assert!(normal_filter.filter(&compatibility).passed());
 
-        let normal_filter_b = NormalFilter::new(vec!["がぎぐげご".to_owned()], Vec::new(), false);
+        let normal_filter_b = NormalFilter::new(&["がぎぐげご".to_owned()], &[], false);
         assert!(normal_filter_b.filter(&composition).passed());
         assert!(normal_filter_b.filter(&decomposition).passed());
         assert!(normal_filter_b.filter(&compatibility).passed());

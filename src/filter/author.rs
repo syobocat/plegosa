@@ -8,7 +8,7 @@ pub struct AuthorFilter {
 }
 
 impl AuthorFilter {
-    pub fn new(include: Vec<String>, exclude: Vec<String>) -> Self {
+    pub const fn new(include: Vec<String>, exclude: Vec<String>) -> Self {
         Self { include, exclude }
     }
 }

@@ -10,7 +10,7 @@ pub struct RegexFilter {
 }
 
 impl RegexFilter {
-    pub fn new(include: Vec<String>, exclude: Vec<String>, case_sensitive: bool) -> Self {
+    pub fn new(include: &[String], exclude: &[String], case_sensitive: bool) -> Self {
         Self {
             include: include.iter().map(|exp| Regex::new(exp).unwrap()).collect(),
             exclude: exclude.iter().map(|exp| Regex::new(exp).unwrap()).collect(),
@@ -55,12 +55,12 @@ mod test {
             ..plain_status()
         };
 
-        let regex_filter_a = RegexFilter::new(vec!["this.*d match".to_owned()], Vec::new(), false);
+        let regex_filter_a = RegexFilter::new(&["this.*d match".to_owned()], &[], false);
         assert!(regex_filter_a.filter(&should_match).passed());
         assert!(regex_filter_a.filter(&should_not_match).blocked());
         assert!(regex_filter_a.filter(&some_random_status).blocked());
 
-        let regex_filter_b = RegexFilter::new(Vec::new(), vec!["this.*not".to_owned()], false);
+        let regex_filter_b = RegexFilter::new(&[], &["this.*not".to_owned()], false);
         assert!(regex_filter_b.filter(&should_match).passed());
         assert!(regex_filter_b.filter(&should_not_match).blocked());
         assert!(regex_filter_b.filter(&some_random_status).passed());

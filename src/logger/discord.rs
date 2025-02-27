@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Context, Result};
 use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
 use reqwest::{Client, RequestBuilder};
 use serde_json::json;
@@ -57,7 +57,7 @@ impl Logger for DiscordLogger {
         };
         self.client
             .try_clone()
-            .ok_or(anyhow!("Failed to clone RequestBuilder"))?
+            .context("Failed to clone RequestBuilder")?
             .json(&json)
             .send()
             .await?;
