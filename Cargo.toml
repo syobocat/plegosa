@@ -6,7 +6,7 @@
 name = "plegosa"
 version = "0.4.2"
 authors = ["SyoBoN <syobon@syobon.net>"]
-edition = "2021"
+edition = "2024"
 description = "A simple Egosa (ego-search) tool for Pleroma"
 repository = "https://github.com/syobocat/plegosa/"
 license-file = "LICENSE"

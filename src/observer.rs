@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use megalodon::{entities::StatusVisibility, streaming::Message, Megalodon};
+use megalodon::{Megalodon, entities::StatusVisibility, streaming::Message};
 
 use crate::{
     config::Timeline,

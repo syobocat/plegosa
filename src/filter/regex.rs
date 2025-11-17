@@ -5,7 +5,7 @@
 use megalodon::entities::Status;
 use regex::Regex;
 
-use super::{normalize, Filter, FilterResult};
+use super::{Filter, FilterResult, normalize};
 
 pub struct RegexFilter {
     include: Vec<Regex>,

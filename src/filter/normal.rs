@@ -4,7 +4,7 @@
 
 use megalodon::entities::Status;
 
-use super::{normalize, Filter, FilterResult};
+use super::{Filter, FilterResult, normalize};
 
 pub struct NormalFilter {
     include: Vec<String>,

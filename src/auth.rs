@@ -4,9 +4,9 @@
 
 use std::io::{self, Write};
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use colored::Colorize;
-use megalodon::{default::NO_REDIRECT, megalodon::AppInputOptions, SNS};
+use megalodon::{SNS, default::NO_REDIRECT, megalodon::AppInputOptions};
 use url::Url;
 
 use crate::USER_AGENT;

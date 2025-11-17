@@ -4,7 +4,7 @@
 
 use std::{env, fs, process};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use colored::Colorize;
 use megalodon::SNS;
 use regex::Regex;

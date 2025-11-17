@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: UPL-1.0
 
 use anyhow::{Context, Result};
-use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
+use megalodon::entities::{Status, StatusVisibility, attachment::AttachmentType};
 use reqwest::{Client, RequestBuilder};
 use serde_json::json;
 
