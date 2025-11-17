@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2025 SyoBoN <syobon@syobon.net>
+
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 # v0.4
 
 ## 変更

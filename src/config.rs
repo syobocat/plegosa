@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use std::{env, fs, process};
 
 use anyhow::{anyhow, Context, Result};

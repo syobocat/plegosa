@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use anyhow::Result;
 use discord::DiscordLogger;
 use megalodon::entities::Status;

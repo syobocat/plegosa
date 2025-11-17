@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use author::AuthorFilter;
 use kanaria::string::UCSStr;
 use megalodon::entities::Status;

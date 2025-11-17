@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use anyhow::Result;
 use megalodon::entities::Status;
 use nanohtml2text::html2text;

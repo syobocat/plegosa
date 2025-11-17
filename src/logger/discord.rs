@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use anyhow::{Context, Result};
 use megalodon::entities::{attachment::AttachmentType, Status, StatusVisibility};
 use reqwest::{Client, RequestBuilder};
