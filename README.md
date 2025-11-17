@@ -19,7 +19,7 @@ token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # アクセストークン
 targets = [ 'Home' ] # 監視するタイムライン ('Home'、'Local'、'Public'が指定可能)
 
 [filter]
-case_sensitive = true # include, excludeで大文字/小文字、ひらがな/カタカナ及び互換等価な字を区別するかどうか(falseでも正準等価な字は区別しません) (デフォルト: true)
+case_sensitive = true # include, excludeで大文字/小文字、ひらがな/カタカナ及び互換等価な字を区別するかどうか(trueでも正準等価な字は区別しません) (デフォルト: true)
 use_regex = false # include, excludeを正規表現として扱うかどうか (デフォルト: false)
 include = [] # ヒットさせたい単語(空の場合全てにヒットします)
 exclude = [] # 除外したい単語
