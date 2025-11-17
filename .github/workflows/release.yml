@@ -59,7 +59,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             ext: .exe
 
-          - build_for: Windows-aarch64
+          - release_for: Windows-aarch64
             os: windows-latest
             target: aarch64-pc-windows-msvc
             ext: .exe
