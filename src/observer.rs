@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use std::sync::Arc;
 
 use megalodon::{entities::StatusVisibility, streaming::Message, Megalodon};

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2025 SyoBoN <syobon@syobon.net>
+
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 # これはなに
 
 Pleromaに移住した結果Misskeyのアンテナが恋しくなってしまったので作ったエゴサツールです。
@@ -9,6 +15,12 @@ Plegosaという名前ですがおそらくMastodonでも動きます。Friendic
 `config.toml`ファイルを作って以下の情報を書きこめばOKです。  
 `user_*`でのユーザーの書式は`@hoge@example.tld`ではなく`hoge@example.tld`なので注意してください。なお、ローカルのユーザーの場合は`@example.tld`すら不要で`hoge`のみです。
 
+<!--
+SPDX-SnippetBegin
+SPDX-SnippetCopyrightText: NONE
+
+SPDX-License-Identifier: CC0-1.0
+-->
 ```toml
 [instance]
 software = 'Pleroma' # ソフトウェア名
@@ -34,3 +46,4 @@ enable = false # ヒットログをDiscordに送信するかどうか (デフォ
 use_embed = true # リンクを直貼りするのではなくEmbedとして送信する(公開範囲によってはfalseでもEmbedとして送信されます) (デフォルト: true)
 webhook = 'https://discord.com/api/webhooks/0000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx-xxxxxxxxxxxxxxxxxx' # WebhookのURL
 ```
+<!--SPDX-SnippetEnd-->

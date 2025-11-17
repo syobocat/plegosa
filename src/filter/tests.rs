@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 SyoBoN <syobon@syobon.net>
+//
+// SPDX-License-Identifier: UPL-1.0
+
 use megalodon::entities::{Account, Status, StatusVisibility};
 
 pub fn plain_account() -> Account {
