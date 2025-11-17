@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: NONE
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Build Check (All)
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build - ${{ matrix.platform.build_for }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - build_for: Linux-x86_64-musl
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+
+          - build_for: Linux-aarch64-musl
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+
+          - build_for: Linux-x86_64-gnu
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+
+          - build_for: Linux-aarch64-gnu
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+
+          - build_for: FreeBSD-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+
+          - build_for: NetBSD-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-netbsd
+
+          - build_for: OpenBSD-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-openbsd
+
+          - build_for: DragonflyBSD-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-dragonfly
+
+          - build_for: illumos-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-illumos
+
+          - build_for: Solaris-x86_64
+            os: ubuntu-latest
+            target: x86_64-pc-solaris
+
+          - build_for: Haiku-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-haiku
+
+          - build_for: Windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+          - build_for: Windows-aarch64
+            os: windows-latest
+            target: aarch64-pc-windows-msvc
+
+          - build_for: macOS-x86_64
+            os: macOS-latest
+            target: x86_64-apple-darwin
+
+          - build_for: macOS-aarch64
+            os: macOS-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install musl-tools
+        run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
+        if: contains(matrix.platform.build_for, 'musl')
+      - name: Build
+        uses: houseabsolute/actions-rust-cross@v1
+        with:
+          command: build
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release"
