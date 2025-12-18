@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: UPL-1.0
 
-use megalodon::entities::{Account, Status, StatusVisibility};
+use megalodon::entities::{Account, QuoteApproval, Status, StatusVisibility};
 
 pub fn plain_account() -> Account {
     Account {
@@ -69,6 +69,7 @@ pub fn plain_status() -> Status {
         pinned: Default::default(),
         emoji_reactions: Default::default(),
         quote: Default::default(),
+        quote_approval: QuoteApproval::automatic_unsupported(),
         bookmarked: Default::default(),
     }
 }

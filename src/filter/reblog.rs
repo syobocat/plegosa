@@ -16,7 +16,7 @@ impl ReblogFilter {
 
 impl Filter for ReblogFilter {
     fn filter(&self, status: &Status) -> FilterResult {
-        if status.reblog.is_some() && !status.quote {
+        if status.reblog.is_some() && status.quote.is_none() {
             return FilterResult::Block("The status is a repeat".to_owned());
         }
         FilterResult::Pass
@@ -25,7 +25,7 @@ impl Filter for ReblogFilter {
 
 #[cfg(test)]
 mod test {
-    use megalodon::entities::Status;
+    use megalodon::entities::{Quote, QuoteState, QuotedStatus, Status};
 
     use crate::filter::tests::*;
 
@@ -35,17 +35,20 @@ mod test {
     fn reblog_test() {
         let not_reblog = Status {
             reblog: None,
-            quote: false,
+            quote: None,
             ..plain_status()
         };
         let reblog = Status {
             reblog: Some(Box::new(plain_status())),
-            quote: false,
+            quote: None,
             ..plain_status()
         };
         let quote = Status {
             reblog: Some(Box::new(plain_status())),
-            quote: true,
+            quote: Some(QuotedStatus::Quote(Quote {
+                state: QuoteState::Accepted,
+                quoted_status: Some(Box::new(plain_status())),
+            })),
             ..plain_status()
         };
 
