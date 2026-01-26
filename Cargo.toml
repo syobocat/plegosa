@@ -22,12 +22,18 @@ megalodon = "1.0.3"
 nanohtml2text = "0.2.1"
 regex = "1.11.2"
 reqwest = { version = "0.13.1", features = ["json"] }
+rustls = { version = "0.23.36", features = ["aws-lc-rs", "ring"] }
 serde = { version = "1.0.223", features = ["derive"] }
 serde_json = "1.0.145"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
 toml = "0.9.5"
 unicode-normalization = "0.1.24"
 url = { version = "2.5.7", features = ["serde"] }
+
+[features]
+default = ["aws-lc-rs"]
+aws-lc-rs = []
+ring = []
 
 # Workaround for #11
 [package.metadata.cross.target.x86_64-unknown-netbsd]

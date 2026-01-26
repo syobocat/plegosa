@@ -9,6 +9,7 @@ use config::{Config, Timeline};
 use env_logger::Env;
 use filter::Filters;
 use logger::Loggers;
+
 use tokio::task::JoinSet;
 
 mod auth;
@@ -22,6 +23,22 @@ const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VE
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("plegosa=info"));
+
+    #[cfg(feature = "aws-lc-rs")]
+    rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .unwrap();
+
+    #[cfg(feature = "ring")]
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .unwrap();
+
+    #[cfg(all(feature = "aws-lc-rs", feature = "ring"))]
+    compile_error!("Please disable either `aws-lc-rs` or `ring` feature.");
+
+    #[cfg(not(any(feature = "aws-lc-rs", feature = "ring")))]
+    compile_error!("Please enable either `aws-lc-rs` or `ring` feature.");
 
     let config = Config::load().context("Failed to load config")?;
     config.validate().await.context("Invalid config")?;
