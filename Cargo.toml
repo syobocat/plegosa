@@ -47,6 +47,7 @@ pre-build = [
     "dir=$(mktemp -d)",
     "curl https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/base.tar.xz -O",
     "tar -C ${dir} -xJf base.tar.xz",
+    "cp ${dir}/lib/libc.so /usr/local/x86_64-unknown-netbsd/lib",
     "cp ${dir}/usr/lib/libexecinfo.so /usr/local/x86_64-unknown-netbsd/lib",
     "rm base.tar.xz",
     "rm -rf ${dir}",
