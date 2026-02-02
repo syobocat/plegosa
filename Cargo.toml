@@ -35,6 +35,12 @@ default = ["aws-lc-rs"]
 aws-lc-rs = []
 ring = []
 
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z"
+strip = true
+
 # Workaround for #11
 [package.metadata.cross.target.x86_64-unknown-netbsd]
 pre-build = [
